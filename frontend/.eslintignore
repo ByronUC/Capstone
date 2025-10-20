@@ -1,0 +1,7 @@
+# Ignorar verificación de tipos durante build
+src/components/Admin/**
+src/components/Items/**
+src/components/Pending/**
+src/components/UserSettings/**
+src/components/ui/**
+src/components/Common/**

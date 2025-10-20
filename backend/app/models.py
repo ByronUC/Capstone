@@ -253,6 +253,24 @@ class PacienteCreate(PacienteBase):
     id_prevision: int | None = None
 
 
+class PacienteUpdate(SQLModel):
+    rut: str | None = Field(default=None, max_length=12)
+    nombres: str | None = Field(default=None, max_length=100)
+    apellido_paterno: str | None = Field(default=None, max_length=50)
+    apellido_materno: str | None = Field(default=None, max_length=50)
+    fecha_nacimiento: date | None = None
+    genero: str | None = Field(default=None, max_length=20)
+    telefono: str | None = Field(default=None, max_length=20)
+    email: str | None = Field(default=None, max_length=100)
+    direccion: str | None = None
+    estado_civil: str | None = Field(default=None, max_length=30)
+    ocupacion: str | None = Field(default=None, max_length=100)
+    estado: str | None = Field(default=None, max_length=20)
+    consentimiento_informado: bool | None = None
+    id_ciudad: int | None = None
+    id_prevision: int | None = None
+
+
 class Paciente(PacienteBase, table=True):
     __tablename__ = "pacientes"
 
@@ -273,6 +291,18 @@ class Paciente(PacienteBase, table=True):
     medicamentos: list["Medicamento"] = Relationship(back_populates="paciente", cascade_delete=True)
     seguimientos: list["Seguimiento"] = Relationship(back_populates="paciente", cascade_delete=True)
     sesiones: list["SesionClinica"] = Relationship(back_populates="paciente")
+
+
+class PacientePublic(PacienteBase):
+    id_paciente: int
+    id_ciudad: int | None
+    id_prevision: int | None
+    fecha_registro: datetime
+
+
+class PacientesPublic(SQLModel):
+    data: list[PacientePublic]
+    count: int
 
 
 # Tabla: contactos_emergencia
@@ -424,6 +454,37 @@ class Cita(CitaBase, table=True):
     tratamientos: list["Tratamiento"] = Relationship(back_populates="cita")
 
 
+class CitaPublic(CitaBase):
+    id_cita: int
+    id_paciente: int
+    id_psicologo: int
+    id_servicio: int
+    id_sala: int | None
+    id_estado_cita: int
+    codigo_confirmacion: str | None
+    fecha_creacion: datetime
+    fecha_modificacion: datetime | None
+
+
+class CitasPublic(SQLModel):
+    data: list[CitaPublic]
+    count: int
+
+
+class CitaUpdate(SQLModel):
+    fecha_cita: date | None = None
+    hora_inicio: time | None = None
+    hora_fin: time | None = None
+    motivo_consulta: str | None = None
+    observaciones: str | None = None
+    id_paciente: int | None = None
+    id_psicologo: int | None = None
+    id_servicio: int | None = None
+    id_sala: int | None = None
+    id_estado_cita: int | None = None
+    recordatorio_enviado: bool | None = None
+
+
 # ============================================
 # MODELOS CLÍNICOS
 # ============================================
@@ -498,6 +559,35 @@ class Tratamiento(TratamientoBase, table=True):
     seguimientos: list["Seguimiento"] = Relationship(back_populates="tratamiento")
 
 
+class TratamientoPublic(TratamientoBase):
+    id_tratamiento: int
+    id_paciente: int
+    id_psicologo: int
+    id_cita: int | None
+    fecha_registro: datetime
+
+
+class TratamientosPublic(SQLModel):
+    data: list[TratamientoPublic]
+    count: int
+
+
+class TratamientoCreate(TratamientoBase):
+    id_paciente: int
+    id_psicologo: int
+    id_cita: int | None = None
+
+
+class TratamientoUpdate(SQLModel):
+    tipo_tratamiento: str | None = Field(default=None, max_length=100)
+    descripcion: str | None = None
+    objetivos: str | None = None
+    fecha_inicio: date | None = None
+    fecha_fin_estimada: date | None = None
+    fecha_fin_real: date | None = None
+    estado: str | None = Field(default=None, max_length=30)
+
+
 # Tabla: medicamentos
 class MedicamentoBase(SQLModel):
     nombre_medicamento: str = Field(max_length=150)
@@ -524,6 +614,35 @@ class Medicamento(MedicamentoBase, table=True):
     tratamiento: Optional[Tratamiento] = Relationship(back_populates="medicamentos")
 
 
+class MedicamentoPublic(MedicamentoBase):
+    id_medicamento: int
+    id_paciente: int
+    id_tratamiento: int | None
+    fecha_registro: datetime
+
+
+class MedicamentosPublic(SQLModel):
+    data: list[MedicamentoPublic]
+    count: int
+
+
+class MedicamentoCreate(MedicamentoBase):
+    id_paciente: int
+    id_tratamiento: int | None = None
+
+
+class MedicamentoUpdate(SQLModel):
+    nombre_medicamento: str | None = Field(default=None, max_length=150)
+    dosis: str | None = Field(default=None, max_length=100)
+    frecuencia: str | None = Field(default=None, max_length=100)
+    via_administracion: str | None = Field(default=None, max_length=50)
+    fecha_inicio: date | None = None
+    fecha_fin: date | None = None
+    prescrito_por: str | None = Field(default=None, max_length=150)
+    observaciones: str | None = None
+    estado: str | None = Field(default=None, max_length=20)
+
+
 # Tabla: seguimientos
 class SeguimientoBase(SQLModel):
     fecha_seguimiento: date
@@ -548,6 +667,35 @@ class Seguimiento(SeguimientoBase, table=True):
     paciente: Paciente = Relationship(back_populates="seguimientos")
     psicologo: Psicologo = Relationship(back_populates="seguimientos")
     tratamiento: Optional[Tratamiento] = Relationship(back_populates="seguimientos")
+
+
+class SeguimientoPublic(SeguimientoBase):
+    id_seguimiento: int
+    id_paciente: int
+    id_psicologo: int
+    id_tratamiento: int | None
+    fecha_registro: datetime
+
+
+class SeguimientosPublic(SQLModel):
+    data: list[SeguimientoPublic]
+    count: int
+
+
+class SeguimientoCreate(SeguimientoBase):
+    id_paciente: int
+    id_psicologo: int
+    id_tratamiento: int | None = None
+
+
+class SeguimientoUpdate(SQLModel):
+    fecha_seguimiento: date | None = None
+    tipo_seguimiento: str | None = Field(default=None, max_length=50)
+    estado_animo: str | None = Field(default=None, max_length=100)
+    nivel_funcionalidad: int | None = None
+    adherencia_tratamiento: str | None = Field(default=None, max_length=50)
+    observaciones: str | None = None
+    proxima_evaluacion: date | None = None
 
 
 # Tabla: sesiones_clinicas

@@ -50,3 +50,17 @@ export const DrawerBackdrop = ChakraDrawer.Backdrop
 export const DrawerDescription = ChakraDrawer.Description
 export const DrawerTitle = ChakraDrawer.Title
 export const DrawerActionTrigger = ChakraDrawer.ActionTrigger
+
+export const Drawer = {
+  Root: DrawerRoot,
+  Trigger: DrawerTrigger,
+  Content: DrawerContent,
+  CloseTrigger: DrawerCloseTrigger,
+  Footer: DrawerFooter,
+  Header: DrawerHeader,
+  Body: DrawerBody,
+  Backdrop: DrawerBackdrop,
+  Description: DrawerDescription,
+  Title: DrawerTitle,
+  ActionTrigger: DrawerActionTrigger,
+}

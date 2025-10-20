@@ -5,6 +5,10 @@ WORKDIR /app
 
 COPY package*.json /app/
 
+# Configurar Node.js para usar menos memoria durante el build
+# Ajusta el valor según la RAM de tu VPS (2048 = 2GB, 1024 = 1GB)
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
 RUN npm install
 
 COPY ./ /app/
