@@ -168,18 +168,12 @@ export default function LandingFooter() {
         <Box pt={8} mt={8} borderTop="1px solid" borderColor="rgba(255, 255, 255, 0.1)">
           <Flex
             direction={{ base: "column", md: "row" }}
-            justify="space-between"
+            justify="center"
             align="center"
             gap={4}
           >
-            <Text fontSize="sm" color="gray.400" textAlign={{ base: "center", md: "left" }}>
+            <Text fontSize="sm" color="gray.400" textAlign="center">
               © {currentYear} Conectemos Chile. Todos los derechos reservados.
-            </Text>
-            <Text fontSize="sm" color="gray.400">
-              Desarrollo web por{" "}
-              <Link href="https://www.wisestlabs.cl" target="_blank" color="#FFA726" fontWeight="600" _hover={{ textDecoration: "underline" }}>
-                Wisest Labs
-              </Link>
             </Text>
           </Flex>
         </Box>
