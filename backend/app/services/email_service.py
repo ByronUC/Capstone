@@ -52,8 +52,8 @@ class EmailService:
             else:
                 server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=5)
 
-            # Autenticación si hay credenciales
-            if settings.SMTP_USER and settings.SMTP_PASSWORD:
+            # Autenticación si hay credenciales (excepto para mailcatcher)
+            if settings.SMTP_USER and settings.SMTP_PASSWORD and settings.SMTP_HOST != "mailcatcher":
                 server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
 
             # Enviar email
