@@ -211,7 +211,7 @@ class Psicologo(PsicologoBase, table=True):
 class PsicologoPublic(PsicologoBase):
     id_psicologo: int
     id_usuario: int
-    fecha_registro: datetime
+    fecha_registro: datetime | None = None
 
 
 class PsicologosPublic(SQLModel):
