@@ -11,12 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ReservarCitaRouteImport } from './routes/reservar-cita'
 import { Route as RecoverPasswordRouteImport } from './routes/recover-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GestionarCitaRouteImport } from './routes/gestionar-cita'
+import { Route as ConfirmacionCitaRouteImport } from './routes/confirmacion-cita'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
 import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
+import { Route as LayoutCitasPendientesRouteImport } from './routes/_layout/citas-pendientes'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
 
 const SignupRoute = SignupRouteImport.update({
@@ -29,6 +33,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReservarCitaRoute = ReservarCitaRouteImport.update({
+  id: '/reservar-cita',
+  path: '/reservar-cita',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RecoverPasswordRoute = RecoverPasswordRouteImport.update({
   id: '/recover-password',
   path: '/recover-password',
@@ -37,6 +46,16 @@ const RecoverPasswordRoute = RecoverPasswordRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestionarCitaRoute = GestionarCitaRouteImport.update({
+  id: '/gestionar-cita',
+  path: '/gestionar-cita',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmacionCitaRoute = ConfirmacionCitaRouteImport.update({
+  id: '/confirmacion-cita',
+  path: '/confirmacion-cita',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LayoutRoute = LayoutRouteImport.update({
@@ -58,6 +77,11 @@ const LayoutItemsRoute = LayoutItemsRouteImport.update({
   path: '/items',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutCitasPendientesRoute = LayoutCitasPendientesRouteImport.update({
+  id: '/citas-pendientes',
+  path: '/citas-pendientes',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutAdminRoute = LayoutAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -66,21 +90,29 @@ const LayoutAdminRoute = LayoutAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/confirmacion-cita': typeof ConfirmacionCitaRoute
+  '/gestionar-cita': typeof GestionarCitaRoute
   '/login': typeof LoginRoute
   '/recover-password': typeof RecoverPasswordRoute
+  '/reservar-cita': typeof ReservarCitaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
+  '/citas-pendientes': typeof LayoutCitasPendientesRoute
   '/items': typeof LayoutItemsRoute
   '/settings': typeof LayoutSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/confirmacion-cita': typeof ConfirmacionCitaRoute
+  '/gestionar-cita': typeof GestionarCitaRoute
   '/login': typeof LoginRoute
   '/recover-password': typeof RecoverPasswordRoute
+  '/reservar-cita': typeof ReservarCitaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
+  '/citas-pendientes': typeof LayoutCitasPendientesRoute
   '/items': typeof LayoutItemsRoute
   '/settings': typeof LayoutSettingsRoute
 }
@@ -88,11 +120,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteWithChildren
+  '/confirmacion-cita': typeof ConfirmacionCitaRoute
+  '/gestionar-cita': typeof GestionarCitaRoute
   '/login': typeof LoginRoute
   '/recover-password': typeof RecoverPasswordRoute
+  '/reservar-cita': typeof ReservarCitaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_layout/admin': typeof LayoutAdminRoute
+  '/_layout/citas-pendientes': typeof LayoutCitasPendientesRoute
   '/_layout/items': typeof LayoutItemsRoute
   '/_layout/settings': typeof LayoutSettingsRoute
 }
@@ -100,32 +136,44 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/confirmacion-cita'
+    | '/gestionar-cita'
     | '/login'
     | '/recover-password'
+    | '/reservar-cita'
     | '/reset-password'
     | '/signup'
     | '/admin'
+    | '/citas-pendientes'
     | '/items'
     | '/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/confirmacion-cita'
+    | '/gestionar-cita'
     | '/login'
     | '/recover-password'
+    | '/reservar-cita'
     | '/reset-password'
     | '/signup'
     | '/admin'
+    | '/citas-pendientes'
     | '/items'
     | '/settings'
   id:
     | '__root__'
     | '/'
     | '/_layout'
+    | '/confirmacion-cita'
+    | '/gestionar-cita'
     | '/login'
     | '/recover-password'
+    | '/reservar-cita'
     | '/reset-password'
     | '/signup'
     | '/_layout/admin'
+    | '/_layout/citas-pendientes'
     | '/_layout/items'
     | '/_layout/settings'
   fileRoutesById: FileRoutesById
@@ -133,8 +181,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LayoutRoute: typeof LayoutRouteWithChildren
+  ConfirmacionCitaRoute: typeof ConfirmacionCitaRoute
+  GestionarCitaRoute: typeof GestionarCitaRoute
   LoginRoute: typeof LoginRoute
   RecoverPasswordRoute: typeof RecoverPasswordRoute
+  ReservarCitaRoute: typeof ReservarCitaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
 }
@@ -155,6 +206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reservar-cita': {
+      id: '/reservar-cita'
+      path: '/reservar-cita'
+      fullPath: '/reservar-cita'
+      preLoaderRoute: typeof ReservarCitaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recover-password': {
       id: '/recover-password'
       path: '/recover-password'
@@ -167,6 +225,20 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionar-cita': {
+      id: '/gestionar-cita'
+      path: '/gestionar-cita'
+      fullPath: '/gestionar-cita'
+      preLoaderRoute: typeof GestionarCitaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirmacion-cita': {
+      id: '/confirmacion-cita'
+      path: '/confirmacion-cita'
+      fullPath: '/confirmacion-cita'
+      preLoaderRoute: typeof ConfirmacionCitaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_layout': {
@@ -197,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutItemsRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/citas-pendientes': {
+      id: '/_layout/citas-pendientes'
+      path: '/citas-pendientes'
+      fullPath: '/citas-pendientes'
+      preLoaderRoute: typeof LayoutCitasPendientesRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/admin': {
       id: '/_layout/admin'
       path: '/admin'
@@ -209,12 +288,14 @@ declare module '@tanstack/react-router' {
 
 interface LayoutRouteChildren {
   LayoutAdminRoute: typeof LayoutAdminRoute
+  LayoutCitasPendientesRoute: typeof LayoutCitasPendientesRoute
   LayoutItemsRoute: typeof LayoutItemsRoute
   LayoutSettingsRoute: typeof LayoutSettingsRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAdminRoute: LayoutAdminRoute,
+  LayoutCitasPendientesRoute: LayoutCitasPendientesRoute,
   LayoutItemsRoute: LayoutItemsRoute,
   LayoutSettingsRoute: LayoutSettingsRoute,
 }
@@ -225,8 +306,11 @@ const LayoutRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LayoutRoute: LayoutRouteWithChildren,
+  ConfirmacionCitaRoute: ConfirmacionCitaRoute,
+  GestionarCitaRoute: GestionarCitaRoute,
   LoginRoute: LoginRoute,
   RecoverPasswordRoute: RecoverPasswordRoute,
+  ReservarCitaRoute: ReservarCitaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
 }

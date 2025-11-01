@@ -11,6 +11,8 @@ from app.api.routes import (
     tratamientos,
     medicacion,
     seguimiento,
+    servicios,
+    psicologos,
 )
 from app.core.config import settings
 
@@ -20,9 +22,13 @@ api_router.include_router(users.router)
 api_router.include_router(utils.router)
 api_router.include_router(items.router)
 
-# Módulos clínicos
-api_router.include_router(pacientes.router)
+# Sistema de Reservas - Core
+api_router.include_router(servicios.router)
+api_router.include_router(psicologos.router)
 api_router.include_router(citas.router)
+
+# Módulos clínicos complementarios
+api_router.include_router(pacientes.router)
 api_router.include_router(tratamientos.router)
 api_router.include_router(medicacion.router)
 api_router.include_router(seguimiento.router)

@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     SMTP_USER: str | None = None
     SMTP_PASSWORD: str | None = None
     EMAILS_FROM_EMAIL: EmailStr | None = None
-    EMAILS_FROM_NAME: EmailStr | None = None
+    EMAILS_FROM_NAME: str | None = None
 
     @model_validator(mode="after")
     def _set_default_emails_from(self) -> Self:
@@ -93,6 +93,11 @@ class Settings(BaseSettings):
     EMAIL_TEST_USER: EmailStr = "test@example.com"
     FIRST_SUPERUSER: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
+
+    # Google Calendar
+    GOOGLE_CALENDAR_ENABLED: bool = False
+    GOOGLE_CALENDAR_CREDENTIALS_PATH: str | None = None
+    GOOGLE_CALENDAR_ID: str = "primary"
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":

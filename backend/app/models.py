@@ -208,6 +208,17 @@ class Psicologo(PsicologoBase, table=True):
     sesiones: list["SesionClinica"] = Relationship(back_populates="psicologo")
 
 
+class PsicologoPublic(PsicologoBase):
+    id_psicologo: int
+    id_usuario: int
+    fecha_registro: datetime
+
+
+class PsicologosPublic(SQLModel):
+    data: list[PsicologoPublic]
+    count: int
+
+
 # Tabla: psicologos_especialidades (Relación N:M)
 class PsicologoEspecialidadBase(SQLModel):
     id_psicologo: int = Field(foreign_key="psicologos.id_psicologo")
@@ -348,6 +359,15 @@ class Servicio(ServicioBase, table=True):
     citas: list["Cita"] = Relationship(back_populates="servicio")
 
 
+class ServicioPublic(ServicioBase):
+    id_servicio: int
+
+
+class ServiciosPublic(SQLModel):
+    data: list[ServicioPublic]
+    count: int
+
+
 # Tabla: salas_atencion
 class SalaAtencionBase(SQLModel):
     nombre_sala: str = Field(max_length=50)
@@ -438,6 +458,7 @@ class Cita(CitaBase, table=True):
     id_sala: int | None = Field(default=None, foreign_key="salas_atencion.id_sala")
     id_estado_cita: int = Field(foreign_key="estados_cita.id_estado_cita")
     codigo_confirmacion: str | None = Field(default=None, unique=True, max_length=20)
+    google_calendar_event_id: str | None = Field(default=None, max_length=255)
     fecha_creacion: datetime | None = Field(default_factory=datetime.utcnow)
     fecha_modificacion: datetime | None = None
     usuario_creacion: int | None = Field(default=None, foreign_key="usuarios.id_usuario")
@@ -452,6 +473,7 @@ class Cita(CitaBase, table=True):
     usuario_creador: Optional[Usuario] = Relationship(back_populates="citas_creadas")
     sesiones: list["SesionClinica"] = Relationship(back_populates="cita", cascade_delete=True)
     tratamientos: list["Tratamiento"] = Relationship(back_populates="cita")
+    notificaciones: list["Notificacion"] = Relationship(back_populates="cita", cascade_delete=True)
 
 
 class CitaPublic(CitaBase):
@@ -733,11 +755,11 @@ class SesionClinica(SesionClinicaBase, table=True):
 # Tabla: notificaciones
 class NotificacionBase(SQLModel):
     email_destinatario: str | None = Field(default=None, max_length=100)
-    tipo_notificacion: str = Field(max_length=50)
+    tipo_notificacion: str = Field(max_length=50)  # confirmacion_inicial, confirmacion_final, cancelacion, reagendamiento, recordatorio
     asunto: str = Field(max_length=200)
     contenido: str
     fecha_programada: datetime | None = None
-    estado: str = Field(default='pendiente', max_length=20)
+    estado: str = Field(default='pendiente', max_length=20)  # pendiente, enviada, fallida
     intentos_envio: int = Field(default=0)
 
 
@@ -745,12 +767,15 @@ class Notificacion(NotificacionBase, table=True):
     __tablename__ = "notificaciones"
 
     id_notificacion: int | None = Field(default=None, primary_key=True)
+    id_cita: int | None = Field(default=None, foreign_key="citas.id_cita")
     id_usuario: int | None = Field(default=None, foreign_key="usuarios.id_usuario")
     fecha_enviada: datetime | None = None
+    error_mensaje: str | None = None
     fecha_creacion: datetime | None = Field(default_factory=datetime.utcnow)
 
     # Relaciones
     usuario: Optional[Usuario] = Relationship(back_populates="notificaciones")
+    cita: Optional["Cita"] = Relationship(back_populates="notificaciones")
 
 
 # ============================================
