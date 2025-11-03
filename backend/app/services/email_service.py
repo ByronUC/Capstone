@@ -110,6 +110,7 @@ class EmailService:
         session.add(notificacion_paciente)
 
         # ===== NOTIFICACIÓN PARA EL PSICÓLOGO =====
+        notificacion_psicologo = None
         if cita.psicologo and cita.psicologo.email_personal:
             telefono_paciente = cita.paciente.telefono if hasattr(cita.paciente, 'telefono') else ""
 
@@ -136,6 +137,12 @@ class EmailService:
 
         session.commit()
         session.refresh(notificacion_paciente)
+
+        # Enviar ambas notificaciones
+        EmailService.enviar_notificacion(session, notificacion_paciente.id_notificacion)
+        if notificacion_psicologo:
+            session.refresh(notificacion_psicologo)
+            EmailService.enviar_notificacion(session, notificacion_psicologo.id_notificacion)
 
         return notificacion_paciente
 
@@ -197,6 +204,7 @@ class EmailService:
         session.add(notificacion_paciente)
 
         # ===== NOTIFICACIÓN PARA EL PSICÓLOGO =====
+        notificacion_psicologo = None
         if cita.psicologo and cita.psicologo.email_personal:
             telefono_paciente = cita.paciente.telefono if hasattr(cita.paciente, 'telefono') else ""
 
@@ -225,6 +233,12 @@ class EmailService:
 
         session.commit()
         session.refresh(notificacion_paciente)
+
+        # Enviar ambas notificaciones
+        EmailService.enviar_notificacion(session, notificacion_paciente.id_notificacion)
+        if notificacion_psicologo:
+            session.refresh(notificacion_psicologo)
+            EmailService.enviar_notificacion(session, notificacion_psicologo.id_notificacion)
 
         return notificacion_paciente
 
@@ -265,6 +279,7 @@ class EmailService:
         session.add(notificacion_paciente)
 
         # ===== NOTIFICACIÓN PARA EL PSICÓLOGO =====
+        notificacion_psicologo = None
         if cita.psicologo and cita.psicologo.email_personal:
             contenido_psicologo = get_cancelacion_psicologo_template(
                 nombre_psicologo=nombre_psicologo,
@@ -288,6 +303,12 @@ class EmailService:
 
         session.commit()
         session.refresh(notificacion_paciente)
+
+        # Enviar ambas notificaciones
+        EmailService.enviar_notificacion(session, notificacion_paciente.id_notificacion)
+        if notificacion_psicologo:
+            session.refresh(notificacion_psicologo)
+            EmailService.enviar_notificacion(session, notificacion_psicologo.id_notificacion)
 
         return notificacion_paciente
 
@@ -337,6 +358,7 @@ class EmailService:
         session.add(notificacion_paciente)
 
         # ===== NOTIFICACIÓN PARA EL PSICÓLOGO =====
+        notificacion_psicologo = None
         if cita.psicologo and cita.psicologo.email_personal:
             contenido_psicologo = get_reagendamiento_psicologo_template(
                 nombre_psicologo=nombre_psicologo,
@@ -363,6 +385,12 @@ class EmailService:
 
         session.commit()
         session.refresh(notificacion_paciente)
+
+        # Enviar ambas notificaciones
+        EmailService.enviar_notificacion(session, notificacion_paciente.id_notificacion)
+        if notificacion_psicologo:
+            session.refresh(notificacion_psicologo)
+            EmailService.enviar_notificacion(session, notificacion_psicologo.id_notificacion)
 
         return notificacion_paciente
 

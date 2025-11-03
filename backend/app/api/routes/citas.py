@@ -199,17 +199,14 @@ def create_reserva(*, session: SessionDep, reserva: ReservaCreate) -> Any:
     nombre_psicologo = f"{cita.psicologo.nombres} {cita.psicologo.apellido_paterno}"
     nombre_servicio = cita.servicio.nombre_servicio
 
-    # Crear notificación usando el servicio
-    notificacion = EmailService.crear_notificacion_confirmacion_inicial(
+    # Crear y enviar notificaciones (paciente + psicólogo)
+    EmailService.crear_notificacion_confirmacion_inicial(
         session=session,
         cita=cita,
         nombre_paciente=nombre_completo,
         nombre_psicologo=nombre_psicologo,
         nombre_servicio=nombre_servicio
     )
-
-    # Enviar email inmediatamente
-    EmailService.enviar_notificacion(session, notificacion.id_notificacion)
 
     # Respuesta con el código de confirmación
     return {
@@ -308,7 +305,8 @@ def reagendar_cita(
     nombre_psicologo = f"{cita.psicologo.nombres} {cita.psicologo.apellido_paterno}"
     nombre_servicio = cita.servicio.nombre_servicio
 
-    notificacion = EmailService.crear_notificacion_reagendamiento(
+    # Crear y enviar notificaciones de reagendamiento (paciente + psicólogo)
+    EmailService.crear_notificacion_reagendamiento(
         session=session,
         cita=cita,
         nombre_paciente=nombre_completo,
@@ -318,9 +316,6 @@ def reagendar_cita(
         hora_antigua_inicio=hora_antigua_inicio,
         hora_antigua_fin=hora_antigua_fin
     )
-
-    # Enviar email inmediatamente
-    EmailService.enviar_notificacion(session, notificacion.id_notificacion)
 
     # 6. Actualizar evento en Google Calendar si existe
     if cita.google_calendar_event_id:
@@ -394,16 +389,14 @@ def cancelar_cita(session: SessionDep, codigo_confirmacion: str) -> Message:
     nombre_psicologo = f"{cita.psicologo.nombres} {cita.psicologo.apellido_paterno}"
     nombre_servicio = cita.servicio.nombre if cita.servicio else ""
 
-    notificacion = EmailService.crear_notificacion_cancelacion(
+    # Crear y enviar notificaciones de cancelación (paciente + psicólogo)
+    EmailService.crear_notificacion_cancelacion(
         session=session,
         cita=cita,
         nombre_paciente=nombre_completo,
         nombre_psicologo=nombre_psicologo,
         nombre_servicio=nombre_servicio
     )
-
-    # Enviar email inmediatamente
-    EmailService.enviar_notificacion(session, notificacion.id_notificacion)
 
     # 4. Eliminar evento de Google Calendar si existe
     if cita.google_calendar_event_id:
@@ -454,16 +447,14 @@ def confirmar_cita(session: SessionDep, id: int) -> Any:
     nombre_psicologo = f"{cita.psicologo.nombres} {cita.psicologo.apellido_paterno}"
     nombre_servicio = cita.servicio.nombre_servicio
 
-    notificacion = EmailService.crear_notificacion_confirmacion_final(
+    # Crear y enviar notificaciones de confirmación final (paciente + psicólogo)
+    EmailService.crear_notificacion_confirmacion_final(
         session=session,
         cita=cita,
         nombre_paciente=nombre_completo,
         nombre_psicologo=nombre_psicologo,
         nombre_servicio=nombre_servicio
     )
-
-    # Enviar email inmediatamente
-    EmailService.enviar_notificacion(session, notificacion.id_notificacion)
 
     # 4. Crear evento en Google Calendar y guardar event_id
     from datetime import datetime as dt
