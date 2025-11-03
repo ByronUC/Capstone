@@ -285,7 +285,8 @@ def reagendar_cita(
 
     # Guardar fecha/hora antigua para el email
     fecha_antigua = cita.fecha_cita
-    hora_antigua = cita.hora_inicio
+    hora_antigua_inicio = cita.hora_inicio
+    hora_antigua_fin = cita.hora_fin
 
     # 3. Actualizar fecha y hora de la cita
     cita.fecha_cita = nueva_fecha
@@ -314,7 +315,8 @@ def reagendar_cita(
         nombre_psicologo=nombre_psicologo,
         nombre_servicio=nombre_servicio,
         fecha_antigua=fecha_antigua,
-        hora_antigua=hora_antigua
+        hora_antigua_inicio=hora_antigua_inicio,
+        hora_antigua_fin=hora_antigua_fin
     )
 
     # Enviar email inmediatamente
@@ -390,12 +392,14 @@ def cancelar_cita(session: SessionDep, codigo_confirmacion: str) -> Message:
 
     nombre_completo = f"{cita.paciente.nombres} {cita.paciente.apellido_paterno}"
     nombre_psicologo = f"{cita.psicologo.nombres} {cita.psicologo.apellido_paterno}"
+    nombre_servicio = cita.servicio.nombre if cita.servicio else ""
 
     notificacion = EmailService.crear_notificacion_cancelacion(
         session=session,
         cita=cita,
         nombre_paciente=nombre_completo,
-        nombre_psicologo=nombre_psicologo
+        nombre_psicologo=nombre_psicologo,
+        nombre_servicio=nombre_servicio
     )
 
     # Enviar email inmediatamente

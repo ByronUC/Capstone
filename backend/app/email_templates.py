@@ -408,3 +408,301 @@ def get_recordatorio_template(
     </body>
     </html>
     """
+
+
+# ========== TEMPLATES PARA PSICÓLOGOS ==========
+
+def get_confirmacion_inicial_psicologo_template(
+    nombre_psicologo: str,
+    nombre_paciente: str,
+    fecha: str,
+    hora_inicio: str,
+    hora_fin: str,
+    nombre_servicio: str,
+    telefono_paciente: str = ""
+) -> str:
+    """Template para notificar al psicólogo sobre nueva solicitud de cita pendiente"""
+    telefono_info = ""
+    if telefono_paciente:
+        telefono_info = f"<p><strong>📞 Teléfono:</strong> {telefono_paciente}</p>"
+
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background-color: #3182CE; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+            .content {{ background-color: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }}
+            .info-box {{ background-color: white; padding: 20px; margin: 20px 0; border-left: 4px solid #3182CE; border-radius: 4px; }}
+            .status {{ font-size: 18px; font-weight: bold; color: #D69E2E; text-align: center; padding: 15px; background-color: #FEEBC8; border-radius: 4px; margin: 20px 0; }}
+            .footer {{ text-align: center; margin-top: 30px; color: #666; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Nueva Solicitud de Cita</h1>
+            </div>
+            <div class="content">
+                <h2>Hola {nombre_psicologo},</h2>
+
+                <div class="status">
+                    ⏳ Solicitud Pendiente de Confirmación
+                </div>
+
+                <p>Se ha recibido una nueva solicitud de cita que requiere tu atención:</p>
+
+                <div class="info-box">
+                    <p><strong>👤 Paciente:</strong> {nombre_paciente}</p>
+                    {telefono_info}
+                    <p><strong>📅 Fecha:</strong> {fecha}</p>
+                    <p><strong>🕐 Horario:</strong> {hora_inicio} - {hora_fin}</p>
+                    <p><strong>🏥 Servicio:</strong> {nombre_servicio}</p>
+                </div>
+
+                <p><strong>Próximos pasos:</strong></p>
+                <ul>
+                    <li>El equipo de recepción revisará y confirmará la disponibilidad</li>
+                    <li>Una vez confirmada, recibirás un email de confirmación final</li>
+                    <li>La cita aparecerá en tu agenda del sistema</li>
+                </ul>
+
+                <p>Este es un email informativo. No necesitas tomar ninguna acción en este momento.</p>
+            </div>
+            <div class="footer">
+                <p>Conectemos Chile - Sistema de Gestión de Citas<br>
+                Este es un email automático del sistema.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+
+def get_confirmacion_final_psicologo_template(
+    nombre_psicologo: str,
+    nombre_paciente: str,
+    fecha: str,
+    hora_inicio: str,
+    hora_fin: str,
+    nombre_servicio: str,
+    telefono_paciente: str = "",
+    google_calendar_url: str = "",
+    outlook_calendar_url: str = ""
+) -> str:
+    """Template para notificar al psicólogo sobre cita confirmada"""
+    telefono_info = ""
+    if telefono_paciente:
+        telefono_info = f"<p><strong>📞 Teléfono:</strong> {telefono_paciente}</p>"
+
+    # Botones de calendario
+    calendar_buttons = ""
+    if google_calendar_url or outlook_calendar_url:
+        calendar_buttons = '<div style="text-align: center; margin: 30px 0;">'
+        calendar_buttons += '<p style="margin-bottom: 15px;"><strong>📅 Agregar a tu calendario:</strong></p>'
+
+        if google_calendar_url:
+            calendar_buttons += f'''
+            <a href="{google_calendar_url}" target="_blank"
+               style="display: inline-block; padding: 12px 24px; margin: 5px; background-color: #4285F4;
+                      color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                📅 Google Calendar
+            </a>
+            '''
+
+        if outlook_calendar_url:
+            calendar_buttons += f'''
+            <a href="{outlook_calendar_url}" target="_blank"
+               style="display: inline-block; padding: 12px 24px; margin: 5px; background-color: #0078D4;
+                      color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                📅 Outlook
+            </a>
+            '''
+
+        calendar_buttons += '</div>'
+
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background-color: #38A169; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+            .content {{ background-color: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }}
+            .info-box {{ background-color: white; padding: 20px; margin: 20px 0; border-left: 4px solid #38A169; border-radius: 4px; }}
+            .success {{ background-color: #C6F6D5; color: #22543D; padding: 15px; border-radius: 4px; text-align: center; margin: 20px 0; }}
+            .footer {{ text-align: center; margin-top: 30px; color: #666; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>✅ Cita Confirmada en tu Agenda</h1>
+            </div>
+            <div class="content">
+                <h2>Hola {nombre_psicologo},</h2>
+
+                <div class="success">
+                    <strong>Nueva cita confirmada y agregada a tu agenda</strong>
+                </div>
+
+                <p>Se ha confirmado una nueva cita en tu agenda profesional:</p>
+
+                <div class="info-box">
+                    <p><strong>👤 Paciente:</strong> {nombre_paciente}</p>
+                    {telefono_info}
+                    <p><strong>📅 Fecha:</strong> {fecha}</p>
+                    <p><strong>🕐 Horario:</strong> {hora_inicio} - {hora_fin}</p>
+                    <p><strong>🏥 Servicio:</strong> {nombre_servicio}</p>
+                </div>
+
+                {calendar_buttons}
+
+                <p><strong>Recordatorio:</strong></p>
+                <ul>
+                    <li>El paciente ha sido notificado y recibirá un recordatorio 24 horas antes</li>
+                    <li>Puedes ver todos los detalles de la cita en el sistema de gestión</li>
+                    <li>Si necesitas cancelar o reagendar, coordina con recepción</li>
+                </ul>
+
+                <p>¡Éxito en tu sesión!</p>
+            </div>
+            <div class="footer">
+                <p>Conectemos Chile - Sistema de Gestión de Citas<br>
+                Este es un email automático del sistema.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+
+def get_cancelacion_psicologo_template(
+    nombre_psicologo: str,
+    nombre_paciente: str,
+    fecha: str,
+    hora_inicio: str,
+    hora_fin: str,
+    nombre_servicio: str
+) -> str:
+    """Template para notificar al psicólogo sobre cancelación de cita"""
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background-color: #E53E3E; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+            .content {{ background-color: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }}
+            .info-box {{ background-color: white; padding: 20px; margin: 20px 0; border-left: 4px solid #E53E3E; border-radius: 4px; }}
+            .alert {{ background-color: #FED7D7; color: #742A2A; padding: 15px; border-radius: 4px; text-align: center; margin: 20px 0; }}
+            .footer {{ text-align: center; margin-top: 30px; color: #666; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>❌ Cita Cancelada</h1>
+            </div>
+            <div class="content">
+                <h2>Hola {nombre_psicologo},</h2>
+
+                <div class="alert">
+                    <strong>Una cita ha sido cancelada</strong>
+                </div>
+
+                <p>Te informamos que la siguiente cita ha sido cancelada:</p>
+
+                <div class="info-box">
+                    <p><strong>👤 Paciente:</strong> {nombre_paciente}</p>
+                    <p><strong>📅 Fecha:</strong> {fecha}</p>
+                    <p><strong>🕐 Horario:</strong> {hora_inicio} - {hora_fin}</p>
+                    <p><strong>🏥 Servicio:</strong> {nombre_servicio}</p>
+                </div>
+
+                <p>El horario ahora está disponible en tu agenda para nuevas reservas.</p>
+
+                <p>Si tienes alguna pregunta sobre esta cancelación, contacta con recepción.</p>
+            </div>
+            <div class="footer">
+                <p>Conectemos Chile - Sistema de Gestión de Citas<br>
+                Este es un email automático del sistema.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+
+def get_reagendamiento_psicologo_template(
+    nombre_psicologo: str,
+    nombre_paciente: str,
+    fecha_antigua: str,
+    hora_antigua_inicio: str,
+    hora_antigua_fin: str,
+    fecha_nueva: str,
+    hora_nueva_inicio: str,
+    hora_nueva_fin: str,
+    nombre_servicio: str
+) -> str:
+    """Template para notificar al psicólogo sobre reagendamiento de cita"""
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background-color: #D69E2E; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+            .content {{ background-color: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }}
+            .info-box {{ background-color: white; padding: 20px; margin: 20px 0; border-radius: 4px; }}
+            .old-date {{ text-decoration: line-through; color: #999; }}
+            .new-date {{ color: #D69E2E; font-weight: bold; }}
+            .footer {{ text-align: center; margin-top: 30px; color: #666; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🔄 Cita Reagendada</h1>
+            </div>
+            <div class="content">
+                <h2>Hola {nombre_psicologo},</h2>
+
+                <p>Te informamos que una cita ha sido reagendada en tu agenda:</p>
+
+                <p><strong>👤 Paciente:</strong> {nombre_paciente}</p>
+                <p><strong>🏥 Servicio:</strong> {nombre_servicio}</p>
+
+                <div class="info-box" style="border-left: 4px solid #FC8181;">
+                    <h3 style="margin-top: 0;">Fecha anterior (cancelada):</h3>
+                    <p class="old-date">📅 {fecha_antigua}</p>
+                    <p class="old-date">🕐 {hora_antigua_inicio} - {hora_antigua_fin}</p>
+                </div>
+
+                <div class="info-box" style="border-left: 4px solid #38A169;">
+                    <h3 style="margin-top: 0;">Nueva fecha confirmada:</h3>
+                    <p class="new-date">📅 {fecha_nueva}</p>
+                    <p class="new-date">🕐 {hora_nueva_inicio} - {hora_nueva_fin}</p>
+                </div>
+
+                <p>La cita ha sido actualizada automáticamente en tu agenda del sistema.</p>
+
+                <p>El paciente ha sido notificado del cambio y recibirá un recordatorio 24 horas antes de la nueva fecha.</p>
+            </div>
+            <div class="footer">
+                <p>Conectemos Chile - Sistema de Gestión de Citas<br>
+                Este es un email automático del sistema.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
