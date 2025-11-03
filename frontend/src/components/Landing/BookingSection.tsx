@@ -533,30 +533,44 @@ export default function BookingSection() {
                           </Box>
                         ) : horariosDisponibles && horariosDisponibles.length > 0 ? (
                           <Grid templateColumns="repeat(auto-fill, minmax(110px, 1fr))" gap={3}>
-                            {horariosDisponibles.map((hora) => (
-                              <Button
-                                key={hora}
-                                onClick={() => handleHorarioSelect(hora)}
-                                size="lg"
-                                h="60px"
-                                bg={selectedHoraInicio === hora ? "blue.500" : "white"}
-                                color={selectedHoraInicio === hora ? "white" : "gray.700"}
-                                borderWidth="2px"
-                                borderColor={selectedHoraInicio === hora ? "blue.500" : "gray.300"}
-                                fontSize="xl"
-                                fontWeight="bold"
-                                boxShadow="sm"
-                                _hover={{
-                                  bg: selectedHoraInicio === hora ? "blue.600" : "blue.50",
-                                  borderColor: "blue.500",
-                                  transform: "translateY(-2px)",
-                                  shadow: "lg"
-                                }}
-                                transition="all 0.2s"
-                              >
-                                {hora}
-                              </Button>
-                            ))}
+                            {horariosDisponibles.map((horarioInfo: any) => {
+                              const { hora, disponible, ocupado, pasado } = horarioInfo
+
+                              // Determinar si está deshabilitado
+                              const isDisabled = ocupado || pasado
+                              const tooltip = ocupado ? "Horario ocupado" : pasado ? "Horario pasado" : ""
+
+                              return (
+                                <Button
+                                  key={hora}
+                                  onClick={() => !isDisabled && handleHorarioSelect(hora)}
+                                  size="lg"
+                                  h="60px"
+                                  bg={selectedHoraInicio === hora ? "blue.500" : ocupado ? "red.50" : pasado ? "gray.100" : "white"}
+                                  color={selectedHoraInicio === hora ? "white" : ocupado ? "red.600" : pasado ? "gray.500" : "gray.700"}
+                                  borderWidth="2px"
+                                  borderColor={selectedHoraInicio === hora ? "blue.500" : ocupado ? "red.300" : pasado ? "gray.300" : "gray.300"}
+                                  fontSize="xl"
+                                  fontWeight="bold"
+                                  boxShadow="sm"
+                                  disabled={isDisabled}
+                                  cursor={isDisabled ? "not-allowed" : "pointer"}
+                                  opacity={isDisabled ? 0.6 : 1}
+                                  title={tooltip}
+                                  _hover={isDisabled ? {} : {
+                                    bg: selectedHoraInicio === hora ? "blue.600" : "blue.50",
+                                    borderColor: "blue.500",
+                                    transform: "translateY(-2px)",
+                                    shadow: "lg"
+                                  }}
+                                  transition="all 0.2s"
+                                >
+                                  {hora}
+                                  {ocupado && " 🔒"}
+                                  {pasado && " ⏰"}
+                                </Button>
+                              )
+                            })}
                           </Grid>
                         ) : (
                           <Text color="gray.500" textAlign="center" py={4}>
