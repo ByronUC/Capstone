@@ -150,11 +150,12 @@ def get_disponibilidad(
             horarios_ocupados.add(hora_actual.time())
             hora_actual += timedelta(hours=1)
 
-    # 5. Determinar fecha y hora actual en Chile (UTC-3)
-    from datetime import timezone
-    now_utc = datetime.now(timezone.utc)
-    chile_offset = timedelta(hours=-3)
-    now_chile = now_utc + chile_offset
+    # 5. Determinar fecha y hora actual en Chile
+    # Usar zoneinfo (disponible en Python 3.9+) para manejar correctamente la zona horaria
+    from zoneinfo import ZoneInfo
+
+    chile_tz = ZoneInfo('America/Santiago')
+    now_chile = datetime.now(chile_tz)
     fecha_actual_chile = now_chile.date()
     hora_actual_chile = now_chile.time()
 
@@ -167,7 +168,8 @@ def get_disponibilidad(
     horarios_info = []
     for hora in sorted(set(horarios_disponibles)):
         es_ocupado = hora in horarios_ocupados
-        es_pasado = es_hoy and hora <= hora_actual_chile
+        # Un horario está pasado si es hoy Y la hora del slot ya pasó
+        es_pasado = es_hoy and hora < hora_actual_chile
         es_disponible = not es_ocupado and not es_pasado
 
         horarios_info.append(HorarioDisponibilidadInfo(
