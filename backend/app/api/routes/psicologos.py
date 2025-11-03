@@ -51,7 +51,16 @@ def get_psicologos_disponibles(
     return psicologos
 
 
-@router.get("/disponibilidad", response_model=list[str])
+from pydantic import BaseModel
+
+class HorarioDisponibilidadInfo(BaseModel):
+    """Información de disponibilidad de un horario"""
+    hora: str
+    disponible: bool
+    ocupado: bool  # Si ya tiene una cita programada
+    pasado: bool  # Si el horario ya pasó (solo para el día actual)
+
+@router.get("/disponibilidad", response_model=list[HorarioDisponibilidadInfo])
 def get_disponibilidad(
     session: SessionDep,
     psicologo_id: int = Query(..., description="ID del psicólogo"),
@@ -60,15 +69,15 @@ def get_disponibilidad(
     """
     GET /api/disponibilidad?psicologo_id={id}&fecha={YYYY-MM-DD}
 
-    Calcula y retorna horarios disponibles para ese psicólogo en esa fecha.
+    Calcula y retorna horarios con su estado de disponibilidad.
 
     Lógica:
     1. Consultar tabla horarios_disponibles del psicólogo para ese día de semana
     2. Generar array de horarios posibles (intervalos de 1 hora)
     3. Consultar tabla citas para ver horarios ya ocupados en esa fecha
-    4. Restar ocupados de disponibles
+    4. Marcar horarios como ocupados, pasados o disponibles
 
-    Respuesta: array de strings con horarios ["09:00", "10:00", "11:00"]
+    Respuesta: array de objetos con {hora, disponible, ocupado, pasado}
     """
     logger.info(f"===== INICIO get_disponibilidad psicologo_id={psicologo_id}, fecha={fecha} =====")
 
@@ -130,7 +139,7 @@ def get_disponibilidad(
     )
     citas_ocupadas = session.exec(statement).all()
 
-    # 4. Restar horarios ocupados
+    # 4. Identificar horarios ocupados
     horarios_ocupados = set()
     for cita in citas_ocupadas:
         # Marcar como ocupados todos los horarios entre hora_inicio y hora_fin
@@ -141,14 +150,32 @@ def get_disponibilidad(
             horarios_ocupados.add(hora_actual.time())
             hora_actual += timedelta(hours=1)
 
-    # Filtrar horarios disponibles quitando los ocupados
-    horarios_libres = [
-        h for h in horarios_disponibles
-        if h not in horarios_ocupados
-    ]
+    # 5. Determinar fecha y hora actual en Chile (UTC-3)
+    from datetime import timezone
+    now_utc = datetime.now(timezone.utc)
+    chile_offset = timedelta(hours=-3)
+    now_chile = now_utc + chile_offset
+    fecha_actual_chile = now_chile.date()
+    hora_actual_chile = now_chile.time()
 
-    # Convertir a formato string HH:MM
-    horarios_libres_str = [h.strftime("%H:%M") for h in sorted(set(horarios_libres))]
+    es_hoy = (fecha == fecha_actual_chile)
+    logger.info(f"Es hoy: {es_hoy}, Fecha consulta: {fecha}, Fecha actual Chile: {fecha_actual_chile}")
+    if es_hoy:
+        logger.info(f"Hora actual Chile: {hora_actual_chile}")
 
-    logger.info(f"Retornando {len(horarios_libres_str)} horarios disponibles")
-    return horarios_libres_str
+    # 6. Generar array con información completa de disponibilidad
+    horarios_info = []
+    for hora in sorted(set(horarios_disponibles)):
+        es_ocupado = hora in horarios_ocupados
+        es_pasado = es_hoy and hora <= hora_actual_chile
+        es_disponible = not es_ocupado and not es_pasado
+
+        horarios_info.append(HorarioDisponibilidadInfo(
+            hora=hora.strftime("%H:%M"),
+            disponible=es_disponible,
+            ocupado=es_ocupado,
+            pasado=es_pasado
+        ))
+
+    logger.info(f"Retornando {len(horarios_info)} horarios con su estado")
+    return horarios_info

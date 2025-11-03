@@ -85,6 +85,13 @@ export interface ReagendarResponse {
   nueva_hora_inicio: string
 }
 
+export interface HorarioDisponibilidadInfo {
+  hora: string
+  disponible: boolean
+  ocupado: boolean
+  pasado: boolean
+}
+
 export interface CitasPublic {
   data: Cita[]
   count: number
@@ -133,7 +140,7 @@ export const BookingService = {
   async getDisponibilidad(
     psicologoId: number,
     fecha: string,
-  ): Promise<string[]> {
+  ): Promise<HorarioDisponibilidadInfo[]> {
     const url = new URL(`${OpenAPI.BASE}/api/v1/psicologos/disponibilidad`)
     url.searchParams.append("psicologo_id", psicologoId.toString())
     url.searchParams.append("fecha", fecha)

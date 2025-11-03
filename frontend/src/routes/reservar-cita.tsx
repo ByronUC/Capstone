@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { useState } from "react"
 import {
   Box,
   Container,
@@ -115,7 +116,10 @@ function ReservarCitaPage() {
     goToNext()
   }
 
-  const handleHorarioSelect = (hora: string) => {
+  const handleHorarioSelect = (hora: string, disponible: boolean) => {
+    // No permitir seleccionar horarios no disponibles
+    if (!disponible) return
+
     setSelectedHoraInicio(hora)
     // Calcular hora fin basado en duración del servicio
     const [h, m] = hora.split(":").map(Number)
@@ -359,16 +363,45 @@ function ReservarCitaPage() {
                         </Box>
                       ) : horariosDisponibles && horariosDisponibles.length > 0 ? (
                         <Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))" gap={2}>
-                          {horariosDisponibles.map((hora) => (
-                            <Button
-                              key={hora}
-                              onClick={() => handleHorarioSelect(hora)}
-                              variant="outline"
-                              colorScheme="teal"
-                            >
-                              {hora}
-                            </Button>
-                          ))}
+                          {horariosDisponibles.map((horarioInfo) => {
+                            const { hora, disponible, ocupado, pasado } = horarioInfo
+
+                            // Determinar el estado visual
+                            let colorScheme = "teal"
+                            let variant: "outline" | "solid" | "subtle" = "outline"
+                            let isDisabled = false
+                            let tooltip = ""
+
+                            if (ocupado) {
+                              colorScheme = "red"
+                              variant = "subtle"
+                              isDisabled = true
+                              tooltip = "Horario ocupado"
+                            } else if (pasado) {
+                              colorScheme = "gray"
+                              variant = "subtle"
+                              isDisabled = true
+                              tooltip = "Horario pasado"
+                            }
+
+                            return (
+                              <Button
+                                key={hora}
+                                onClick={() => handleHorarioSelect(hora, disponible)}
+                                variant={variant}
+                                colorScheme={colorScheme}
+                                disabled={isDisabled}
+                                cursor={isDisabled ? "not-allowed" : "pointer"}
+                                opacity={isDisabled ? 0.6 : 1}
+                                title={tooltip}
+                                _hover={isDisabled ? {} : { borderColor: "teal.500" }}
+                              >
+                                {hora}
+                                {ocupado && " 🔒"}
+                                {pasado && " ⏰"}
+                              </Button>
+                            )
+                          })}
                         </Grid>
                       ) : (
                         <Alert.Root status="info">
