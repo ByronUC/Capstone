@@ -4,13 +4,12 @@ import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Box, Input, Portal } from "@chakra-ui/react"
 import { FaCalendarAlt } from "react-icons/fa"
-import "react-day-picker/style.css"
 
 interface DatePickerInputProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
-  size?: string
+  size?: "lg" | "sm" | "md" | "xl" | "2xl" | "2xs" | "xs"
 }
 
 export function DatePickerInput({ value, onChange, placeholder = "Selecciona una fecha", size = "lg" }: DatePickerInputProps) {
@@ -103,77 +102,59 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
               left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
             }}
             css={{
-              ".rdp": {
+              "& .rdp": {
                 margin: 0,
+              },
+              "& .rdp-root": {
                 "--rdp-accent-color": "#3182ce",
-                "--rdp-background-color": "#ebf8ff",
-                "--rdp-accent-color-dark": "#2c5282",
-                "--rdp-background-color-dark": "#bee3f8",
-                "--rdp-outline": "2px solid var(--rdp-accent-color)",
-                "--rdp-outline-selected": "2px solid var(--rdp-accent-color)",
+                "--rdp-accent-background-color": "#ebf8ff",
               },
-              ".rdp-month": {
-                fontSize: "16px",
-              },
-              ".rdp-months": {
-                justifyContent: "center",
-              },
-              ".rdp-month_caption": {
+              "& .rdp-month_caption": {
                 fontSize: "18px",
                 fontWeight: 600,
                 color: "#2d3748",
                 marginBottom: "12px",
                 textTransform: "capitalize",
               },
-              ".rdp-nav": {
-                top: "12px",
-              },
-              ".rdp-button": {
-                borderRadius: "8px",
-                transition: "all 0.2s",
-                fontWeight: 500,
-              },
-              ".rdp-day": {
+              "& .rdp-day": {
                 width: "42px",
                 height: "42px",
                 fontSize: "15px",
               },
-              ".rdp-day_button:hover:not(.rdp-day_selected):not(.rdp-day_disabled)": {
+              "& .rdp-day_button": {
+                borderRadius: "8px",
+                transition: "all 0.2s",
+                fontWeight: 500,
+                width: "100%",
+                height: "100%",
+              },
+              "& .rdp-day_button:hover:not([disabled])": {
                 backgroundColor: "#ebf8ff",
                 color: "#2c5282",
-                transform: "scale(1.05)",
               },
-              ".rdp-day_selected": {
+              "& .rdp-day_button[aria-selected='true']": {
                 backgroundColor: "#3182ce !important",
                 color: "white !important",
                 fontWeight: 600,
               },
-              ".rdp-day_today": {
+              "& .rdp-day_button[aria-current='date']": {
                 fontWeight: 700,
                 color: "#3182ce",
               },
-              ".rdp-weekday": {
+              "& .rdp-weekday": {
                 color: "#718096",
                 fontWeight: 600,
                 fontSize: "13px",
                 textTransform: "uppercase",
-                padding: "8px 0",
               },
-              ".rdp-nav_button": {
+              "& .rdp-nav button": {
                 width: "36px",
                 height: "36px",
                 borderRadius: "8px",
                 transition: "all 0.2s",
               },
-              ".rdp-nav_button:hover": {
+              "& .rdp-nav button:hover": {
                 backgroundColor: "#ebf8ff",
-                color: "#2c5282",
-              },
-              ".rdp-chevron": {
-                fill: "#4a5568",
-              },
-              ".rdp-day_disabled": {
-                opacity: 0.3,
               },
             }}
           >
