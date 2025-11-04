@@ -121,6 +121,32 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
                 marginBottom: "8px",
                 textTransform: "capitalize",
               },
+              "& .rdp-dropdowns": {
+                display: "flex",
+                gap: "8px",
+                marginBottom: "12px",
+                justifyContent: "center",
+              },
+              "& .rdp-dropdown": {
+                padding: "6px 8px",
+                fontSize: "14px",
+                fontWeight: 600,
+                border: "2px solid #e2e8f0",
+                borderRadius: "6px",
+                backgroundColor: "white",
+                color: "#2d3748",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              },
+              "& .rdp-dropdown:hover": {
+                borderColor: "#3182ce",
+                backgroundColor: "#ebf8ff",
+              },
+              "& .rdp-dropdown:focus": {
+                outline: "none",
+                borderColor: "#3182ce",
+                boxShadow: "0 0 0 3px rgba(49, 130, 206, 0.1)",
+              },
               "& .rdp-day": {
                 width: "32px",
                 height: "32px",
@@ -152,14 +178,8 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
                 fontSize: "11px",
                 textTransform: "uppercase",
               },
-              "& .rdp-nav button": {
-                width: "28px",
-                height: "28px",
-                borderRadius: "6px",
-                transition: "all 0.2s",
-              },
-              "& .rdp-nav button:hover": {
-                backgroundColor: "#ebf8ff",
+              "& .rdp-nav": {
+                display: "none",
               },
             }}
           >
@@ -170,8 +190,8 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
               locale={es}
               showOutsideDays
               captionLayout="dropdown-months"
-              fromYear={1920}
-              toYear={new Date().getFullYear()}
+              startMonth={new Date(1920, 0)}
+              endMonth={new Date()}
             />
           </Box>
       )}
