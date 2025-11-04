@@ -18,6 +18,8 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
   const inputRef = useRef<HTMLDivElement>(null)
   const pickerRef = useRef<HTMLDivElement>(null)
 
+  console.log("DatePickerInput rendered - isOpen:", isOpen)
+
   // Convertir string YYYY-MM-DD a Date
   useEffect(() => {
     if (value) {
@@ -61,7 +63,10 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
       <Box position="relative">
         <Input
           value={displayValue}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            console.log("Input clicked! Opening calendar")
+            setIsOpen(!isOpen)
+          }}
           placeholder={placeholder}
           readOnly
           cursor="pointer"
