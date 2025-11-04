@@ -6,6 +6,7 @@ import { Link } from "@tanstack/react-router"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { BookingService, type Servicio, type Psicologo } from "../../client/booking"
 import { toaster } from "../ui/toaster"
+import { DatePickerInput } from "./DatePickerInput"
 
 export default function BookingSection() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 })
@@ -821,30 +822,10 @@ export default function BookingSection() {
                         <Text fontWeight="semibold" mb={2} color="gray.700">
                           Fecha de Nacimiento <Text as="span" color="red.500">*</Text>
                         </Text>
-                        <Input
-                          type="date"
+                        <DatePickerInput
                           value={fechaNacimiento}
-                          onChange={(e) => setFechaNacimiento(e.target.value)}
-                          size="lg"
-                          bg="white"
-                          borderColor="gray.300"
-                          _hover={{ borderColor: "blue.400" }}
-                          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)" }}
-                          fontWeight="500"
-                          css={{
-                            colorScheme: "light",
-                            "&::-webkit-calendar-picker-indicator": {
-                              cursor: "pointer",
-                              borderRadius: "4px",
-                              padding: "4px",
-                              filter: "invert(0.5) sepia(1) saturate(5) hue-rotate(175deg)",
-                              transition: "all 0.2s",
-                            },
-                            "&::-webkit-calendar-picker-indicator:hover": {
-                              filter: "invert(0.4) sepia(1) saturate(6) hue-rotate(175deg)",
-                              transform: "scale(1.1)",
-                            }
-                          }}
+                          onChange={setFechaNacimiento}
+                          placeholder="Selecciona tu fecha de nacimiento"
                         />
                       </Box>
                     </Grid>
