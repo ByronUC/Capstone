@@ -115,28 +115,26 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
                 "--rdp-accent-background-color": "#ebf8ff",
               },
               "& .rdp-month_caption": {
-                fontSize: "15px",
-                fontWeight: 600,
-                color: "#2d3748",
-                marginBottom: "8px",
-                textTransform: "capitalize",
+                display: "none",
               },
               "& .rdp-dropdowns": {
                 display: "flex",
                 gap: "8px",
                 marginBottom: "12px",
                 justifyContent: "center",
+                alignItems: "center",
               },
               "& .rdp-dropdown": {
-                padding: "6px 8px",
-                fontSize: "14px",
+                padding: "8px 12px",
+                fontSize: "15px",
                 fontWeight: 600,
                 border: "2px solid #e2e8f0",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 backgroundColor: "white",
                 color: "#2d3748",
                 cursor: "pointer",
                 transition: "all 0.2s",
+                minWidth: "120px",
               },
               "& .rdp-dropdown:hover": {
                 borderColor: "#3182ce",
@@ -189,7 +187,7 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
               onSelect={handleDaySelect}
               locale={es}
               showOutsideDays
-              captionLayout="dropdown-months"
+              captionLayout="dropdown"
               startMonth={new Date(1920, 0)}
               endMonth={new Date()}
             />
