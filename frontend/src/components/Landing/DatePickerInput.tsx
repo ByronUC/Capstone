@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { DayPicker } from "react-day-picker"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { Box, Input, Portal } from "@chakra-ui/react"
+import { Box, Input } from "@chakra-ui/react"
 import { FaCalendarAlt } from "react-icons/fa"
 
 interface DatePickerInputProps {
@@ -91,10 +91,12 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
       </Box>
 
       {isOpen && (
-        <Portal>
           <Box
             ref={pickerRef}
-            position="fixed"
+            position="absolute"
+            top="100%"
+            left={0}
+            mt={2}
             zIndex={9999}
             bg="white"
             boxShadow="2xl"
@@ -102,10 +104,6 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
             border="1px solid"
             borderColor="gray.200"
             p={4}
-            style={{
-              top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 8 : 0,
-              left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
-            }}
             css={{
               "& .rdp": {
                 margin: 0,
@@ -172,7 +170,6 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
               fixedWeeks
             />
           </Box>
-        </Portal>
       )}
     </Box>
   )
