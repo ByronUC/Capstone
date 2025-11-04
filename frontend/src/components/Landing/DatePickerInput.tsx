@@ -103,29 +103,31 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
             borderRadius="xl"
             border="1px solid"
             borderColor="gray.200"
-            p={4}
+            p={3}
+            maxW="320px"
             css={{
               "& .rdp": {
                 margin: 0,
+                fontSize: "14px",
               },
               "& .rdp-root": {
                 "--rdp-accent-color": "#3182ce",
                 "--rdp-accent-background-color": "#ebf8ff",
               },
               "& .rdp-month_caption": {
-                fontSize: "18px",
+                fontSize: "15px",
                 fontWeight: 600,
                 color: "#2d3748",
-                marginBottom: "12px",
+                marginBottom: "8px",
                 textTransform: "capitalize",
               },
               "& .rdp-day": {
-                width: "42px",
-                height: "42px",
-                fontSize: "15px",
+                width: "32px",
+                height: "32px",
+                fontSize: "13px",
               },
               "& .rdp-day_button": {
-                borderRadius: "8px",
+                borderRadius: "6px",
                 transition: "all 0.2s",
                 fontWeight: 500,
                 width: "100%",
@@ -147,13 +149,13 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
               "& .rdp-weekday": {
                 color: "#718096",
                 fontWeight: 600,
-                fontSize: "13px",
+                fontSize: "11px",
                 textTransform: "uppercase",
               },
               "& .rdp-nav button": {
-                width: "36px",
-                height: "36px",
-                borderRadius: "8px",
+                width: "28px",
+                height: "28px",
+                borderRadius: "6px",
                 transition: "all 0.2s",
               },
               "& .rdp-nav button:hover": {
@@ -167,7 +169,9 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
               onSelect={handleDaySelect}
               locale={es}
               showOutsideDays
-              fixedWeeks
+              captionLayout="dropdown-months"
+              fromYear={1920}
+              toYear={new Date().getFullYear()}
             />
           </Box>
       )}
