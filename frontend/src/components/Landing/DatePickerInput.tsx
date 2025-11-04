@@ -114,17 +114,23 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
                 "--rdp-accent-color": "#3182ce",
                 "--rdp-accent-background-color": "#ebf8ff",
               },
-              "& .rdp-month_caption": {
+              "& .rdp-caption": {
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: "12px",
+              },
+              "& .rdp-caption_label": {
                 display: "none",
               },
               "& .rdp-dropdowns": {
-                display: "flex",
+                display: "flex !important",
                 gap: "8px",
-                marginBottom: "12px",
                 justifyContent: "center",
                 alignItems: "center",
+                width: "100%",
               },
-              "& .rdp-dropdown": {
+              "& .rdp-dropdown_month, & .rdp-dropdown_year": {
                 padding: "8px 12px",
                 fontSize: "15px",
                 fontWeight: 600,
@@ -134,13 +140,18 @@ export function DatePickerInput({ value, onChange, placeholder = "Selecciona una
                 color: "#2d3748",
                 cursor: "pointer",
                 transition: "all 0.2s",
-                minWidth: "120px",
               },
-              "& .rdp-dropdown:hover": {
+              "& .rdp-dropdown_month": {
+                minWidth: "130px",
+              },
+              "& .rdp-dropdown_year": {
+                minWidth: "90px",
+              },
+              "& .rdp-dropdown_month:hover, & .rdp-dropdown_year:hover": {
                 borderColor: "#3182ce",
                 backgroundColor: "#ebf8ff",
               },
-              "& .rdp-dropdown:focus": {
+              "& .rdp-dropdown_month:focus, & .rdp-dropdown_year:focus": {
                 outline: "none",
                 borderColor: "#3182ce",
                 boxShadow: "0 0 0 3px rgba(49, 130, 206, 0.1)",
