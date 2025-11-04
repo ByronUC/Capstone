@@ -29,6 +29,92 @@ export default function BookingSection() {
   const [fechaNacimiento, setFechaNacimiento] = useState("")
   const [motivoConsulta, setMotivoConsulta] = useState("")
 
+  // Estados de validación
+  const [rutError, setRutError] = useState("")
+  const [emailError, setEmailError] = useState("")
+
+  // Función para validar RUT chileno
+  const validarRUT = (rut: string): boolean => {
+    // Limpiar el RUT
+    const rutLimpio = rut.replace(/[^0-9kK]/g, "")
+
+    if (rutLimpio.length < 2) return false
+
+    const cuerpo = rutLimpio.slice(0, -1)
+    const dv = rutLimpio.slice(-1).toUpperCase()
+
+    // Calcular dígito verificador
+    let suma = 0
+    let multiplo = 2
+
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+      suma += parseInt(cuerpo[i]) * multiplo
+      multiplo = multiplo === 7 ? 2 : multiplo + 1
+    }
+
+    const dvEsperado = 11 - (suma % 11)
+    const dvCalculado = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString()
+
+    return dv === dvCalculado
+  }
+
+  // Función para formatear RUT mientras se escribe
+  const formatearRUT = (valor: string): string => {
+    // Limpiar el valor
+    const limpio = valor.replace(/[^0-9kK]/g, "")
+
+    if (limpio.length <= 1) return limpio
+
+    const cuerpo = limpio.slice(0, -1)
+    const dv = limpio.slice(-1)
+
+    // Formatear el cuerpo con puntos
+    let cuerpoFormateado = ""
+    for (let i = cuerpo.length - 1, j = 0; i >= 0; i--, j++) {
+      if (j > 0 && j % 3 === 0) cuerpoFormateado = "." + cuerpoFormateado
+      cuerpoFormateado = cuerpo[i] + cuerpoFormateado
+    }
+
+    return `${cuerpoFormateado}-${dv}`
+  }
+
+  // Función para validar email
+  const validarEmail = (email: string): boolean => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return regex.test(email)
+  }
+
+  // Handler para cambio de RUT
+  const handleRutChange = (valor: string) => {
+    const formateado = formatearRUT(valor)
+    setRut(formateado)
+
+    if (valor.length > 0) {
+      if (!validarRUT(valor)) {
+        setRutError("RUT inválido")
+      } else {
+        setRutError("")
+      }
+    } else {
+      setRutError("")
+    }
+  }
+
+  // Handler para cambio de email
+  const handleEmailChange = (valor: string) => {
+    setEmail(valor)
+
+    if (valor.length > 0) {
+      if (!validarEmail(valor)) {
+        setEmailError("Email inválido")
+      } else {
+        setEmailError("")
+      }
+    } else {
+      setEmailError("")
+    }
+  }
+
   // Cargar servicios disponibles
   const { data: servicios, isLoading } = useQuery({
     queryKey: ["servicios-landing"],
@@ -123,6 +209,28 @@ export default function BookingSection() {
         description: "Por favor completa todos los campos",
         type: "error",
       })
+      return
+    }
+
+    // Validar RUT
+    if (!validarRUT(rut)) {
+      toaster.create({
+        title: "RUT inválido",
+        description: "Por favor ingresa un RUT válido en formato XX.XXX.XXX-X",
+        type: "error",
+      })
+      setRutError("RUT inválido")
+      return
+    }
+
+    // Validar Email
+    if (!validarEmail(email)) {
+      toaster.create({
+        title: "Email inválido",
+        description: "Por favor ingresa un email válido",
+        type: "error",
+      })
+      setEmailError("Email inválido")
       return
     }
 
@@ -609,13 +717,18 @@ export default function BookingSection() {
                         <Input
                           placeholder="12.345.678-9"
                           value={rut}
-                          onChange={(e) => setRut(e.target.value)}
+                          onChange={(e) => handleRutChange(e.target.value)}
                           size="lg"
                           bg="white"
-                          borderColor="gray.300"
-                          _hover={{ borderColor: "blue.400" }}
-                          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)" }}
+                          borderColor={rutError ? "red.500" : "gray.300"}
+                          _hover={{ borderColor: rutError ? "red.600" : "blue.400" }}
+                          _focus={{ borderColor: rutError ? "red.500" : "blue.500", boxShadow: rutError ? "0 0 0 1px var(--chakra-colors-red-500)" : "0 0 0 1px var(--chakra-colors-blue-500)" }}
                         />
+                        {rutError && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {rutError}
+                          </Text>
+                        )}
                       </Box>
 
                       <Box>
@@ -690,13 +803,18 @@ export default function BookingSection() {
                           type="email"
                           placeholder="tu@email.com"
                           value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          onChange={(e) => handleEmailChange(e.target.value)}
                           size="lg"
                           bg="white"
-                          borderColor="gray.300"
-                          _hover={{ borderColor: "blue.400" }}
-                          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)" }}
+                          borderColor={emailError ? "red.500" : "gray.300"}
+                          _hover={{ borderColor: emailError ? "red.600" : "blue.400" }}
+                          _focus={{ borderColor: emailError ? "red.500" : "blue.500", boxShadow: emailError ? "0 0 0 1px var(--chakra-colors-red-500)" : "0 0 0 1px var(--chakra-colors-blue-500)" }}
                         />
+                        {emailError && (
+                          <Text color="red.500" fontSize="sm" mt={1}>
+                            {emailError}
+                          </Text>
+                        )}
                       </Box>
 
                       <Box>
@@ -712,6 +830,21 @@ export default function BookingSection() {
                           borderColor="gray.300"
                           _hover={{ borderColor: "blue.400" }}
                           _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)" }}
+                          fontWeight="500"
+                          css={{
+                            colorScheme: "light",
+                            "&::-webkit-calendar-picker-indicator": {
+                              cursor: "pointer",
+                              borderRadius: "4px",
+                              padding: "4px",
+                              filter: "invert(0.5) sepia(1) saturate(5) hue-rotate(175deg)",
+                              transition: "all 0.2s",
+                            },
+                            "&::-webkit-calendar-picker-indicator:hover": {
+                              filter: "invert(0.4) sepia(1) saturate(6) hue-rotate(175deg)",
+                              transform: "scale(1.1)",
+                            }
+                          }}
                         />
                       </Box>
                     </Grid>
