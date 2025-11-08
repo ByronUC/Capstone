@@ -240,6 +240,12 @@ def create_psicologo(
     Crear un nuevo empleado (solo admin).
 
     Nota: El id_usuario debe existir previamente en la tabla usuarios.
+
+    Roles disponibles:
+    - psicologo: Psicólogo clínico (default)
+    - administrativo: Personal administrativo
+    - supervisor: Supervisor o coordinador
+    - otro: Otro tipo de empleado
     """
     # Verificar que el usuario existe
     usuario = session.get(Usuario, psicologo_in.id_usuario)
@@ -290,6 +296,12 @@ def update_psicologo(
 ) -> Any:
     """
     Actualizar un empleado existente (solo admin).
+
+    Roles disponibles:
+    - psicologo: Psicólogo clínico
+    - administrativo: Personal administrativo
+    - supervisor: Supervisor o coordinador
+    - otro: Otro tipo de empleado
     """
     psicologo = session.get(Psicologo, psicologo_id)
     if not psicologo:
