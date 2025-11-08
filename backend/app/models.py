@@ -15,7 +15,6 @@ from sqlmodel import Field, Relationship, SQLModel, Column, String
 class UsuarioBase(SQLModel):
     nombre_usuario: str = Field(unique=True, index=True, max_length=50)
     email: EmailStr = Field(unique=True, index=True, max_length=100)
-    email_corporativo: str | None = Field(default=None, max_length=100, index=True)
     estado: str = Field(default='activo', max_length=20)
     intentos_fallidos: int = Field(default=0)
 
@@ -27,7 +26,6 @@ class UsuarioCreate(UsuarioBase):
 class UsuarioUpdate(SQLModel):
     nombre_usuario: str | None = Field(default=None, max_length=50)
     email: EmailStr | None = Field(default=None, max_length=100)
-    email_corporativo: str | None = Field(default=None, max_length=100)
     contrasena: str | None = Field(default=None, min_length=8, max_length=40)
     estado: str | None = Field(default=None, max_length=20)
 
