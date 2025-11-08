@@ -133,6 +133,24 @@ class Ciudad(CiudadBase, table=True):
     pacientes: list["Paciente"] = Relationship(back_populates="ciudad")
 
 
+class CiudadCreate(CiudadBase):
+    pass
+
+
+class CiudadUpdate(SQLModel):
+    id_region: int | None = None
+    nombre_ciudad: str | None = None
+
+
+class CiudadPublic(CiudadBase):
+    id_ciudad: int
+
+
+class CiudadesPublic(SQLModel):
+    data: list[CiudadPublic]
+    count: int
+
+
 # Tabla: especialidades
 class EspecialidadBase(SQLModel):
     nombre_especialidad: str = Field(unique=True, max_length=100)
@@ -162,6 +180,24 @@ class Prevision(PrevisionBase, table=True):
 
     # Relaciones
     pacientes: list["Paciente"] = Relationship(back_populates="prevision")
+
+
+class PrevisionCreate(PrevisionBase):
+    pass
+
+
+class PrevisionUpdate(SQLModel):
+    nombre_prevision: str | None = None
+    tipo: str | None = None
+
+
+class PrevisionPublic(PrevisionBase):
+    id_prevision: int
+
+
+class PrevisionesPublic(SQLModel):
+    data: list[PrevisionPublic]
+    count: int
 
 
 # ============================================

@@ -13,6 +13,8 @@ from app.api.routes import (
     seguimiento,
     servicios,
     psicologos,
+    previsiones,
+    ciudades,
 )
 from app.core.config import settings
 
@@ -32,6 +34,10 @@ api_router.include_router(pacientes.router)
 api_router.include_router(tratamientos.router)
 api_router.include_router(medicacion.router)
 api_router.include_router(seguimiento.router)
+
+# Módulos de datos maestros
+api_router.include_router(previsiones.router)
+api_router.include_router(ciudades.router)
 
 
 if settings.ENVIRONMENT == "local":
