@@ -161,6 +161,61 @@ def read_user_by_id(
     return user
 
 
+@router.put(
+    "/{user_id}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=UsuarioPublic,
+)
+def update_user_complete(
+    *,
+    session: SessionDep,
+    user_id: int,
+    user_in: UsuarioCreate,
+) -> Any:
+    """
+    Update a user completely (all fields required).
+    """
+
+    db_user = session.get(Usuario, user_id)
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this id does not exist in the system",
+        )
+
+    # Verificar si el email ya existe en otro usuario
+    if user_in.email != db_user.email:
+        existing_user = crud.get_user_by_email(session=session, email=user_in.email)
+        if existing_user:
+            raise HTTPException(
+                status_code=409, detail="User with this email already exists"
+            )
+
+    # Verificar si el nombre de usuario ya existe en otro usuario
+    existing_username = session.exec(
+        select(Usuario).where(
+            Usuario.nombre_usuario == user_in.nombre_usuario,
+            Usuario.id_usuario != user_id
+        )
+    ).first()
+    if existing_username:
+        raise HTTPException(
+            status_code=409, detail="User with this username already exists"
+        )
+
+    # Actualizar todos los campos
+    user_data = user_in.model_dump()
+    # Hash de la nueva contraseña si se proporciona
+    if user_in.contrasena:
+        user_data["contrasena"] = get_password_hash(user_in.contrasena)
+
+    db_user.sqlmodel_update(user_data)
+    session.add(db_user)
+    session.commit()
+    session.refresh(db_user)
+    return db_user
+
+
 @router.patch(
     "/{user_id}",
     dependencies=[Depends(get_current_active_superuser)],
@@ -173,7 +228,7 @@ def update_user(
     user_in: UsuarioUpdate,
 ) -> Any:
     """
-    Update a user.
+    Update a user partially (only provided fields).
     """
 
     db_user = session.get(Usuario, user_id)
