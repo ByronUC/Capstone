@@ -21,7 +21,7 @@ from app.models import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/psicologos", tags=["psicologos"])
+router = APIRouter(prefix="/empleados", tags=["empleados"])
 
 
 @router.get("/disponibles", response_model=list[PsicologoPublic])
@@ -197,13 +197,13 @@ def get_all_psicologos(
     limit: int = Query(100, description="Límite de registros a retornar")
 ) -> Any:
     """
-    Obtener lista de todos los psicólogos (solo admin).
+    Obtener lista de todos los empleados (solo admin).
 
     Parámetros:
     - skip: Paginación - registros a saltar
     - limit: Paginación - máximo de registros a retornar
 
-    Retorna: Lista de psicólogos con conteo total
+    Retorna: Lista de empleados con conteo total
     """
     # Contar total de psicólogos
     count_statement = select(func.count()).select_from(Psicologo)
@@ -222,11 +222,11 @@ def get_psicologo_by_id(
     psicologo_id: int
 ) -> Any:
     """
-    Obtener un psicólogo por ID (solo admin).
+    Obtener un empleado por ID (solo admin).
     """
     psicologo = session.get(Psicologo, psicologo_id)
     if not psicologo:
-        raise HTTPException(status_code=404, detail="Psicólogo no encontrado")
+        raise HTTPException(status_code=404, detail="Empleado no encontrado")
 
     return psicologo
 
@@ -237,7 +237,7 @@ def create_psicologo(
     psicologo_in: PsicologoCreate
 ) -> Any:
     """
-    Crear un nuevo psicólogo (solo admin).
+    Crear un nuevo empleado (solo admin).
 
     Nota: El id_usuario debe existir previamente en la tabla usuarios.
     """
@@ -246,14 +246,14 @@ def create_psicologo(
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    # Verificar que el usuario no esté ya asociado a otro psicólogo
+    # Verificar que el usuario no esté ya asociado a otro empleado
     existing_psicologo = session.exec(
         select(Psicologo).where(Psicologo.id_usuario == psicologo_in.id_usuario)
     ).first()
     if existing_psicologo:
         raise HTTPException(
             status_code=400,
-            detail="Este usuario ya está asociado a un psicólogo"
+            detail="Este usuario ya está asociado a un empleado"
         )
 
     # Verificar que el RUT no esté duplicado
@@ -289,11 +289,11 @@ def update_psicologo(
     psicologo_in: PsicologoUpdate
 ) -> Any:
     """
-    Actualizar un psicólogo existente (solo admin).
+    Actualizar un empleado existente (solo admin).
     """
     psicologo = session.get(Psicologo, psicologo_id)
     if not psicologo:
-        raise HTTPException(status_code=404, detail="Psicólogo no encontrado")
+        raise HTTPException(status_code=404, detail="Empleado no encontrado")
 
     # Verificar RUT duplicado (si se está actualizando)
     if psicologo_in.rut and psicologo_in.rut != psicologo.rut:
@@ -336,17 +336,17 @@ def delete_psicologo(
     psicologo_id: int
 ) -> Any:
     """
-    Eliminar un psicólogo (solo admin).
+    Eliminar un empleado (solo admin).
 
     Nota: Esto hará un soft delete cambiando el estado a 'inactivo'.
     """
     psicologo = session.get(Psicologo, psicologo_id)
     if not psicologo:
-        raise HTTPException(status_code=404, detail="Psicólogo no encontrado")
+        raise HTTPException(status_code=404, detail="Empleado no encontrado")
 
     # Soft delete
     psicologo.estado = 'inactivo'
     session.add(psicologo)
     session.commit()
 
-    return Message(message="Psicólogo eliminado correctamente")
+    return Message(message="Empleado eliminado correctamente")
