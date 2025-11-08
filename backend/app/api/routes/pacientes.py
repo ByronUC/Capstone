@@ -1,4 +1,5 @@
 from typing import Any
+from datetime import datetime
 
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
@@ -12,6 +13,10 @@ from app.models import (
     PacientePublic,
     PacientesPublic,
     PacienteUpdate,
+    Tratamiento,
+    Medicamento,
+    Seguimiento,
+    Psicologo,
 )
 
 router = APIRouter(prefix="/pacientes", tags=["pacientes"])
@@ -169,3 +174,129 @@ def delete_paciente(session: SessionDep, id: int) -> Message:
     session.commit()
 
     return Message(message="Paciente dado de baja exitosamente")
+
+
+@router.get("/{id}/reporte", response_model=dict)
+def get_reporte_paciente(id: int, session: SessionDep) -> Any:
+    """
+    Obtener reporte general completo del paciente.
+
+    Incluye:
+    - Información básica del paciente
+    - Tratamientos (activos e históricos)
+    - Medicamentos (activos e históricos)
+    - Seguimientos
+    """
+    # Verificar que el paciente existe
+    paciente = session.get(Paciente, id)
+    if not paciente:
+        raise HTTPException(
+            status_code=404,
+            detail="El paciente no existe en el sistema",
+        )
+
+    # Calcular edad
+    hoy = datetime.now().date()
+    edad = hoy.year - paciente.fecha_nacimiento.year
+    if hoy.month < paciente.fecha_nacimiento.month or \
+       (hoy.month == paciente.fecha_nacimiento.month and hoy.day < paciente.fecha_nacimiento.day):
+        edad -= 1
+
+    # Obtener tratamientos
+    tratamientos_stmt = select(Tratamiento).where(
+        Tratamiento.id_paciente == id
+    ).order_by(Tratamiento.fecha_inicio.desc())
+    tratamientos = session.exec(tratamientos_stmt).all()
+
+    tratamientos_data = []
+    for t in tratamientos:
+        psicologo = session.get(Psicologo, t.id_psicologo)
+        tratamientos_data.append({
+            "id_tratamiento": t.id_tratamiento,
+            "tipo_tratamiento": t.tipo_tratamiento,
+            "descripcion": t.descripcion,
+            "objetivos": t.objetivos,
+            "fecha_inicio": t.fecha_inicio.isoformat(),
+            "fecha_fin_estimada": t.fecha_fin_estimada.isoformat() if t.fecha_fin_estimada else None,
+            "fecha_fin_real": t.fecha_fin_real.isoformat() if t.fecha_fin_real else None,
+            "estado": t.estado,
+            "psicologo": f"{psicologo.nombres} {psicologo.apellido_paterno}" if psicologo else "N/A",
+            "fecha_registro": t.fecha_registro.isoformat() if t.fecha_registro else None
+        })
+
+    # Obtener medicamentos
+    medicamentos_stmt = select(Medicamento).where(
+        Medicamento.id_paciente == id
+    ).order_by(Medicamento.fecha_inicio.desc())
+    medicamentos = session.exec(medicamentos_stmt).all()
+
+    medicamentos_data = []
+    for m in medicamentos:
+        medicamentos_data.append({
+            "id_medicamento": m.id_medicamento,
+            "nombre_medicamento": m.nombre_medicamento,
+            "dosis": m.dosis,
+            "frecuencia": m.frecuencia,
+            "via_administracion": m.via_administracion,
+            "fecha_inicio": m.fecha_inicio.isoformat(),
+            "fecha_fin": m.fecha_fin.isoformat() if m.fecha_fin else None,
+            "prescrito_por": m.prescrito_por,
+            "observaciones": m.observaciones,
+            "estado": m.estado,
+            "fecha_registro": m.fecha_registro.isoformat() if m.fecha_registro else None
+        })
+
+    # Obtener seguimientos
+    seguimientos_stmt = select(Seguimiento).where(
+        Seguimiento.id_paciente == id
+    ).order_by(Seguimiento.fecha_seguimiento.desc())
+    seguimientos = session.exec(seguimientos_stmt).all()
+
+    seguimientos_data = []
+    for s in seguimientos:
+        psicologo = session.get(Psicologo, s.id_psicologo)
+        seguimientos_data.append({
+            "id_seguimiento": s.id_seguimiento,
+            "fecha_seguimiento": s.fecha_seguimiento.isoformat(),
+            "tipo_seguimiento": s.tipo_seguimiento,
+            "estado_animo": s.estado_animo,
+            "nivel_funcionalidad": s.nivel_funcionalidad,
+            "adherencia_tratamiento": s.adherencia_tratamiento,
+            "observaciones": s.observaciones,
+            "proxima_evaluacion": s.proxima_evaluacion.isoformat() if s.proxima_evaluacion else None,
+            "psicologo": f"{psicologo.nombres} {psicologo.apellido_paterno}" if psicologo else "N/A",
+            "fecha_registro": s.fecha_registro.isoformat() if s.fecha_registro else None
+        })
+
+    # Construir reporte
+    reporte = {
+        "paciente": {
+            "id_paciente": paciente.id_paciente,
+            "rut": paciente.rut,
+            "nombres": paciente.nombres,
+            "apellido_paterno": paciente.apellido_paterno,
+            "apellido_materno": paciente.apellido_materno,
+            "fecha_nacimiento": paciente.fecha_nacimiento.isoformat(),
+            "edad": edad,
+            "genero": paciente.genero,
+            "telefono": paciente.telefono,
+            "email": paciente.email,
+            "direccion": paciente.direccion,
+            "estado_civil": paciente.estado_civil,
+            "ocupacion": paciente.ocupacion,
+            "estado": paciente.estado,
+            "fecha_registro": paciente.fecha_registro.isoformat() if paciente.fecha_registro else None
+        },
+        "resumen": {
+            "total_tratamientos": len(tratamientos),
+            "tratamientos_activos": len([t for t in tratamientos if t.estado == 'activo']),
+            "total_medicamentos": len(medicamentos),
+            "medicamentos_activos": len([m for m in medicamentos if m.estado == 'activo']),
+            "total_seguimientos": len(seguimientos)
+        },
+        "tratamientos": tratamientos_data,
+        "medicamentos": medicamentos_data,
+        "seguimientos": seguimientos_data
+    }
+
+    return reporte
