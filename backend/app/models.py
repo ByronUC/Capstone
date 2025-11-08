@@ -49,7 +49,7 @@ class Usuario(UsuarioBase, table=True):
 
 class UsuarioPublic(UsuarioBase):
     id_usuario: int
-    fecha_creacion: datetime
+    fecha_creacion: datetime | None
 
 
 class UsuariosPublic(SQLModel):
