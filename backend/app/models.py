@@ -183,6 +183,7 @@ class PsicologoBase(SQLModel):
     universidad: str | None = Field(default=None, max_length=150)
     anios_experiencia: int | None = None
     foto_perfil: str | None = Field(default=None, max_length=255)
+    rol_empleado: str | None = Field(default='psicologo', max_length=50)
     estado: str = Field(default='activo', max_length=20)
 
 
@@ -228,6 +229,7 @@ class PsicologoUpdate(SQLModel):
     universidad: str | None = Field(default=None, max_length=150)
     anios_experiencia: int | None = None
     foto_perfil: str | None = Field(default=None, max_length=255)
+    rol_empleado: str | None = Field(default=None, max_length=50)
     estado: str | None = Field(default=None, max_length=20)
 
 
