@@ -15,6 +15,7 @@ from sqlmodel import Field, Relationship, SQLModel, Column, String
 class UsuarioBase(SQLModel):
     nombre_usuario: str = Field(unique=True, index=True, max_length=50)
     email: EmailStr = Field(unique=True, index=True, max_length=100)
+    email_corporativo: str | None = Field(default=None, max_length=100, index=True)
     estado: str = Field(default='activo', max_length=20)
     intentos_fallidos: int = Field(default=0)
 
@@ -26,6 +27,7 @@ class UsuarioCreate(UsuarioBase):
 class UsuarioUpdate(SQLModel):
     nombre_usuario: str | None = Field(default=None, max_length=50)
     email: EmailStr | None = Field(default=None, max_length=100)
+    email_corporativo: str | None = Field(default=None, max_length=100)
     contrasena: str | None = Field(default=None, min_length=8, max_length=40)
     estado: str | None = Field(default=None, max_length=20)
 
@@ -212,6 +214,23 @@ class PsicologoPublic(PsicologoBase):
     id_psicologo: int
     id_usuario: int
     fecha_registro: datetime | None = None
+
+
+class PsicologoUpdate(SQLModel):
+    rut: str | None = Field(default=None, max_length=12)
+    nombres: str | None = Field(default=None, max_length=100)
+    apellido_paterno: str | None = Field(default=None, max_length=50)
+    apellido_materno: str | None = Field(default=None, max_length=50)
+    fecha_nacimiento: date | None = None
+    telefono: str | None = Field(default=None, max_length=20)
+    email_personal: str | None = Field(default=None, max_length=100)
+    direccion: str | None = None
+    registro_profesional: str | None = Field(default=None, max_length=50)
+    titulo_profesional: str | None = Field(default=None, max_length=150)
+    universidad: str | None = Field(default=None, max_length=150)
+    anios_experiencia: int | None = None
+    foto_perfil: str | None = Field(default=None, max_length=255)
+    estado: str | None = Field(default=None, max_length=20)
 
 
 class PsicologosPublic(SQLModel):

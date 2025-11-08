@@ -2,16 +2,21 @@ from typing import Any
 from datetime import date, time, datetime, timedelta
 import logging
 
-from fastapi import APIRouter, HTTPException, Query
-from sqlmodel import select
+from fastapi import APIRouter, HTTPException, Query, Depends
+from sqlmodel import select, func
 
-from app.api.deps import SessionDep
+from app.api.deps import SessionDep, get_current_active_superuser
 from app.models import (
     Psicologo,
     PsicologoPublic,
+    PsicologosPublic,
+    PsicologoCreate,
+    PsicologoUpdate,
     PsicologoEspecialidad,
     HorarioDisponible,
     Cita,
+    Usuario,
+    Message,
 )
 
 logger = logging.getLogger(__name__)
@@ -181,3 +186,167 @@ def get_disponibilidad(
 
     logger.info(f"Retornando {len(horarios_info)} horarios con su estado")
     return horarios_info
+
+
+# ==================== CRUD ENDPOINTS ====================
+
+@router.get("/", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologosPublic)
+def get_all_psicologos(
+    session: SessionDep,
+    skip: int = Query(0, description="Número de registros a saltar"),
+    limit: int = Query(100, description="Límite de registros a retornar")
+) -> Any:
+    """
+    Obtener lista de todos los psicólogos (solo admin).
+
+    Parámetros:
+    - skip: Paginación - registros a saltar
+    - limit: Paginación - máximo de registros a retornar
+
+    Retorna: Lista de psicólogos con conteo total
+    """
+    # Contar total de psicólogos
+    count_statement = select(func.count()).select_from(Psicologo)
+    count = session.exec(count_statement).one()
+
+    # Obtener psicólogos con paginación
+    statement = select(Psicologo).offset(skip).limit(limit).order_by(Psicologo.id_psicologo.desc())
+    psicologos = session.exec(statement).all()
+
+    return PsicologosPublic(data=psicologos, count=count)
+
+
+@router.get("/{psicologo_id}", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
+def get_psicologo_by_id(
+    session: SessionDep,
+    psicologo_id: int
+) -> Any:
+    """
+    Obtener un psicólogo por ID (solo admin).
+    """
+    psicologo = session.get(Psicologo, psicologo_id)
+    if not psicologo:
+        raise HTTPException(status_code=404, detail="Psicólogo no encontrado")
+
+    return psicologo
+
+
+@router.post("/", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
+def create_psicologo(
+    session: SessionDep,
+    psicologo_in: PsicologoCreate
+) -> Any:
+    """
+    Crear un nuevo psicólogo (solo admin).
+
+    Nota: El id_usuario debe existir previamente en la tabla usuarios.
+    """
+    # Verificar que el usuario existe
+    usuario = session.get(Usuario, psicologo_in.id_usuario)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # Verificar que el usuario no esté ya asociado a otro psicólogo
+    existing_psicologo = session.exec(
+        select(Psicologo).where(Psicologo.id_usuario == psicologo_in.id_usuario)
+    ).first()
+    if existing_psicologo:
+        raise HTTPException(
+            status_code=400,
+            detail="Este usuario ya está asociado a un psicólogo"
+        )
+
+    # Verificar que el RUT no esté duplicado
+    existing_rut = session.exec(
+        select(Psicologo).where(Psicologo.rut == psicologo_in.rut)
+    ).first()
+    if existing_rut:
+        raise HTTPException(status_code=400, detail="El RUT ya está registrado")
+
+    # Verificar que el registro profesional no esté duplicado
+    existing_registro = session.exec(
+        select(Psicologo).where(Psicologo.registro_profesional == psicologo_in.registro_profesional)
+    ).first()
+    if existing_registro:
+        raise HTTPException(
+            status_code=400,
+            detail="El registro profesional ya está registrado"
+        )
+
+    # Crear el psicólogo
+    psicologo = Psicologo.model_validate(psicologo_in)
+    session.add(psicologo)
+    session.commit()
+    session.refresh(psicologo)
+
+    return psicologo
+
+
+@router.patch("/{psicologo_id}", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
+def update_psicologo(
+    session: SessionDep,
+    psicologo_id: int,
+    psicologo_in: PsicologoUpdate
+) -> Any:
+    """
+    Actualizar un psicólogo existente (solo admin).
+    """
+    psicologo = session.get(Psicologo, psicologo_id)
+    if not psicologo:
+        raise HTTPException(status_code=404, detail="Psicólogo no encontrado")
+
+    # Verificar RUT duplicado (si se está actualizando)
+    if psicologo_in.rut and psicologo_in.rut != psicologo.rut:
+        existing_rut = session.exec(
+            select(Psicologo).where(
+                Psicologo.rut == psicologo_in.rut,
+                Psicologo.id_psicologo != psicologo_id
+            )
+        ).first()
+        if existing_rut:
+            raise HTTPException(status_code=400, detail="El RUT ya está registrado")
+
+    # Verificar registro profesional duplicado (si se está actualizando)
+    if psicologo_in.registro_profesional and psicologo_in.registro_profesional != psicologo.registro_profesional:
+        existing_registro = session.exec(
+            select(Psicologo).where(
+                Psicologo.registro_profesional == psicologo_in.registro_profesional,
+                Psicologo.id_psicologo != psicologo_id
+            )
+        ).first()
+        if existing_registro:
+            raise HTTPException(
+                status_code=400,
+                detail="El registro profesional ya está registrado"
+            )
+
+    # Actualizar campos
+    psicologo_data = psicologo_in.model_dump(exclude_unset=True)
+    psicologo.sqlmodel_update(psicologo_data)
+    session.add(psicologo)
+    session.commit()
+    session.refresh(psicologo)
+
+    return psicologo
+
+
+@router.delete("/{psicologo_id}", dependencies=[Depends(get_current_active_superuser)], response_model=Message)
+def delete_psicologo(
+    session: SessionDep,
+    psicologo_id: int
+) -> Any:
+    """
+    Eliminar un psicólogo (solo admin).
+
+    Nota: Esto hará un soft delete cambiando el estado a 'inactivo'.
+    """
+    psicologo = session.get(Psicologo, psicologo_id)
+    if not psicologo:
+        raise HTTPException(status_code=404, detail="Psicólogo no encontrado")
+
+    # Soft delete
+    psicologo.estado = 'inactivo'
+    session.add(psicologo)
+    session.commit()
+
+    return Message(message="Psicólogo eliminado correctamente")
