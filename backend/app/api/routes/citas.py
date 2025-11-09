@@ -40,7 +40,7 @@ class ReservaCreate(BaseModel):
 
     # Datos de la cita
     id_servicio: int
-    id_psicologo: int
+    id_empleado: int
     fecha_cita: str  # YYYY-MM-DD
     hora_inicio: str  # HH:MM
     hora_fin: str  # HH:MM
@@ -119,7 +119,7 @@ def create_reserva(*, session: SessionDep, reserva: ReservaCreate) -> Any:
 
     # Verificar si ya existe una cita en ese horario
     statement = select(Cita).where(
-        Cita.id_psicologo == reserva.id_psicologo,
+        Cita.id_empleado == reserva.id_empleado,
         Cita.fecha_cita == fecha_cita,
         Cita.hora_inicio == hora_inicio,
         Cita.id_estado_cita.in_([1, 2])  # Pendiente o Confirmada
@@ -173,7 +173,7 @@ def create_reserva(*, session: SessionDep, reserva: ReservaCreate) -> Any:
     # 6. Crear la cita con estado "Pendiente"
     cita_data = CitaCreate(
         id_paciente=paciente.id_paciente,
-        id_psicologo=reserva.id_psicologo,
+        id_empleado=reserva.id_empleado,
         id_servicio=reserva.id_servicio,
         id_sala=id_sala,
         id_estado_cita=id_estado_pendiente,
@@ -266,7 +266,7 @@ def reagendar_cita(
 
     # Verificar si el nuevo horario está disponible
     statement = select(Cita).where(
-        Cita.id_psicologo == cita.id_psicologo,
+        Cita.id_empleado == cita.id_empleado,
         Cita.fecha_cita == nueva_fecha,
         Cita.hora_inicio == nueva_hora_inicio,
         Cita.id_estado_cita.in_([1, 2]),  # Pendiente o Confirmada

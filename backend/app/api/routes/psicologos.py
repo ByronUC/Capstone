@@ -106,7 +106,7 @@ def get_disponibilidad(
 
     # 1. Consultar horarios disponibles del psicólogo para ese día
     statement = select(HorarioDisponible).where(
-        HorarioDisponible.id_psicologo == psicologo_id,
+        HorarioDisponible.id_empleado == psicologo_id,
         HorarioDisponible.dia_semana == dia_semana,
         HorarioDisponible.disponible == True
     )
@@ -138,7 +138,7 @@ def get_disponibilidad(
 
     # 3. Consultar citas ya ocupadas en esa fecha
     statement = select(Cita).where(
-        Cita.id_psicologo == psicologo_id,
+        Cita.id_empleado == psicologo_id,
         Cita.fecha_cita == fecha,
         Cita.id_estado_cita.in_([1, 2, 3])  # Pendiente, Confirmada, Realizada
     )
