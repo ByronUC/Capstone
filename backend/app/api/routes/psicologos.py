@@ -210,21 +210,21 @@ def get_all_psicologos(
     count = session.exec(count_statement).one()
 
     # Obtener psicólogos con paginación
-    statement = select(Psicologo).offset(skip).limit(limit).order_by(Psicologo.id_psicologo.desc())
+    statement = select(Psicologo).offset(skip).limit(limit).order_by(Psicologo.id_empleado.desc())
     psicologos = session.exec(statement).all()
 
     return PsicologosPublic(data=psicologos, count=count)
 
 
-@router.get("/{psicologo_id}", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
+@router.get("/{empleado_id}", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
 def get_psicologo_by_id(
     session: SessionDep,
-    psicologo_id: int
+    empleado_id: int
 ) -> Any:
     """
     Obtener un empleado por ID (solo admin).
     """
-    psicologo = session.get(Psicologo, psicologo_id)
+    psicologo = session.get(Psicologo, empleado_id)
     if not psicologo:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
 
@@ -288,10 +288,10 @@ def create_psicologo(
     return psicologo
 
 
-@router.patch("/{psicologo_id}", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
+@router.patch("/{empleado_id}", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
 def update_psicologo(
     session: SessionDep,
-    psicologo_id: int,
+    empleado_id: int,
     psicologo_in: PsicologoUpdate
 ) -> Any:
     """
@@ -303,7 +303,7 @@ def update_psicologo(
     - supervisor: Supervisor o coordinador
     - otro: Otro tipo de empleado
     """
-    psicologo = session.get(Psicologo, psicologo_id)
+    psicologo = session.get(Psicologo, empleado_id)
     if not psicologo:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
 
@@ -312,7 +312,7 @@ def update_psicologo(
         existing_rut = session.exec(
             select(Psicologo).where(
                 Psicologo.rut == psicologo_in.rut,
-                Psicologo.id_psicologo != psicologo_id
+                Psicologo.id_empleado != empleado_id
             )
         ).first()
         if existing_rut:
@@ -323,7 +323,7 @@ def update_psicologo(
         existing_registro = session.exec(
             select(Psicologo).where(
                 Psicologo.registro_profesional == psicologo_in.registro_profesional,
-                Psicologo.id_psicologo != psicologo_id
+                Psicologo.id_empleado != empleado_id
             )
         ).first()
         if existing_registro:
@@ -342,17 +342,17 @@ def update_psicologo(
     return psicologo
 
 
-@router.delete("/{psicologo_id}", dependencies=[Depends(get_current_active_superuser)], response_model=Message)
+@router.delete("/{empleado_id}", dependencies=[Depends(get_current_active_superuser)], response_model=Message)
 def delete_psicologo(
     session: SessionDep,
-    psicologo_id: int
+    empleado_id: int
 ) -> Any:
     """
     Eliminar un empleado (solo admin).
 
     Nota: Esto hará un soft delete cambiando el estado a 'inactivo'.
     """
-    psicologo = session.get(Psicologo, psicologo_id)
+    psicologo = session.get(Psicologo, empleado_id)
     if not psicologo:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
 

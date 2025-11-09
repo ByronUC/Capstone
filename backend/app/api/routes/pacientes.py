@@ -210,7 +210,7 @@ def get_reporte_paciente(id: int, session: SessionDep) -> Any:
 
     tratamientos_data = []
     for t in tratamientos:
-        psicologo = session.get(Psicologo, t.id_psicologo)
+        psicologo = session.get(Psicologo, t.id_empleado)
         tratamientos_data.append({
             "id_tratamiento": t.id_tratamiento,
             "tipo_tratamiento": t.tipo_tratamiento,
@@ -254,7 +254,7 @@ def get_reporte_paciente(id: int, session: SessionDep) -> Any:
 
     seguimientos_data = []
     for s in seguimientos:
-        psicologo = session.get(Psicologo, s.id_psicologo)
+        psicologo = session.get(Psicologo, s.id_empleado)
         seguimientos_data.append({
             "id_seguimiento": s.id_seguimiento,
             "fecha_seguimiento": s.fecha_seguimiento.isoformat(),

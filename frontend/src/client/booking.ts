@@ -12,7 +12,7 @@ export interface Servicio {
 }
 
 export interface Psicologo {
-  id_psicologo: number
+  id_empleado: number
   id_usuario: number
   rut: string
   nombres: string
@@ -38,7 +38,7 @@ export interface ReservaCreate {
   email: string
   fecha_nacimiento: string
   id_servicio: number
-  id_psicologo: number
+  id_empleado: number
   fecha_cita: string
   hora_inicio: string
   hora_fin: string
@@ -56,7 +56,7 @@ export interface ReservaResponse {
 export interface Cita {
   id_cita: number
   id_paciente: number
-  id_psicologo: number
+  id_empleado: number
   id_servicio: number
   id_sala: number | null
   id_estado_cita: number

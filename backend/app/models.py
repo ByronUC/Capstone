@@ -230,7 +230,7 @@ class PsicologoCreate(PsicologoBase):
 class Psicologo(PsicologoBase, table=True):
     __tablename__ = "psicologos"
 
-    id_psicologo: int | None = Field(default=None, primary_key=True)
+    id_empleado: int | None = Field(default=None, primary_key=True)
     id_usuario: int = Field(unique=True, foreign_key="usuarios.id_usuario")
     fecha_registro: datetime | None = Field(default_factory=datetime.utcnow)
 
@@ -246,7 +246,7 @@ class Psicologo(PsicologoBase, table=True):
 
 
 class PsicologoPublic(PsicologoBase):
-    id_psicologo: int
+    id_empleado: int
     id_usuario: int
     fecha_registro: datetime | None = None
 
@@ -276,7 +276,7 @@ class PsicologosPublic(SQLModel):
 
 # Tabla: psicologos_especialidades (Relación N:M)
 class PsicologoEspecialidadBase(SQLModel):
-    id_psicologo: int = Field(foreign_key="psicologos.id_psicologo")
+    id_empleado: int = Field(foreign_key="psicologos.id_empleado")
     id_especialidad: int = Field(foreign_key="especialidades.id_especialidad")
     fecha_certificacion: date | None = None
     institucion_certificadora: str | None = Field(default=None, max_length=150)
@@ -457,7 +457,7 @@ class HorarioDisponible(HorarioDisponibleBase, table=True):
     __tablename__ = "horarios_disponibles"
 
     id_horario: int | None = Field(default=None, primary_key=True)
-    id_psicologo: int = Field(foreign_key="psicologos.id_psicologo")
+    id_empleado: int = Field(foreign_key="psicologos.id_empleado")
 
     # Relaciones
     psicologo: Psicologo = Relationship(back_populates="horarios")
@@ -497,7 +497,7 @@ class CitaBase(SQLModel):
 
 class CitaCreate(CitaBase):
     id_paciente: int
-    id_psicologo: int
+    id_empleado: int
     id_servicio: int
     id_sala: int | None = None
     id_estado_cita: int
@@ -508,7 +508,7 @@ class Cita(CitaBase, table=True):
 
     id_cita: int | None = Field(default=None, primary_key=True)
     id_paciente: int = Field(foreign_key="pacientes.id_paciente")
-    id_psicologo: int = Field(foreign_key="psicologos.id_psicologo")
+    id_empleado: int = Field(foreign_key="psicologos.id_empleado")
     id_servicio: int = Field(foreign_key="servicios.id_servicio")
     id_sala: int | None = Field(default=None, foreign_key="salas_atencion.id_sala")
     id_estado_cita: int = Field(foreign_key="estados_cita.id_estado_cita")
@@ -534,7 +534,7 @@ class Cita(CitaBase, table=True):
 class CitaPublic(CitaBase):
     id_cita: int
     id_paciente: int
-    id_psicologo: int
+    id_empleado: int
     id_servicio: int
     id_sala: int | None
     id_estado_cita: int
@@ -581,7 +581,7 @@ class HistorialClinico(HistorialClinicoBase, table=True):
 
     id_historial: int | None = Field(default=None, primary_key=True)
     id_paciente: int = Field(foreign_key="pacientes.id_paciente")
-    id_psicologo: int = Field(foreign_key="psicologos.id_psicologo")
+    id_empleado: int = Field(foreign_key="psicologos.id_empleado")
     fecha_registro: datetime | None = Field(default_factory=datetime.utcnow)
 
     # Relaciones
@@ -624,7 +624,7 @@ class Tratamiento(TratamientoBase, table=True):
 
     id_tratamiento: int | None = Field(default=None, primary_key=True)
     id_paciente: int = Field(foreign_key="pacientes.id_paciente")
-    id_psicologo: int = Field(foreign_key="psicologos.id_psicologo")
+    id_empleado: int = Field(foreign_key="psicologos.id_empleado")
     id_cita: int | None = Field(default=None, foreign_key="citas.id_cita")
     fecha_registro: datetime | None = Field(default_factory=datetime.utcnow)
 
@@ -736,7 +736,7 @@ class Seguimiento(SeguimientoBase, table=True):
 
     id_seguimiento: int | None = Field(default=None, primary_key=True)
     id_paciente: int = Field(foreign_key="pacientes.id_paciente")
-    id_psicologo: int = Field(foreign_key="psicologos.id_psicologo")
+    id_empleado: int = Field(foreign_key="psicologos.id_empleado")
     id_tratamiento: int | None = Field(default=None, foreign_key="tratamientos.id_tratamiento")
     fecha_registro: datetime | None = Field(default_factory=datetime.utcnow)
 
@@ -794,7 +794,7 @@ class SesionClinica(SesionClinicaBase, table=True):
     id_sesion: int | None = Field(default=None, primary_key=True)
     id_cita: int = Field(foreign_key="citas.id_cita")
     id_paciente: int = Field(foreign_key="pacientes.id_paciente")
-    id_psicologo: int = Field(foreign_key="psicologos.id_psicologo")
+    id_empleado: int = Field(foreign_key="psicologos.id_empleado")
     fecha_registro: datetime | None = Field(default_factory=datetime.utcnow)
 
     # Relaciones
