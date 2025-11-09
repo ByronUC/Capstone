@@ -72,10 +72,10 @@ function ReservarCitaPage() {
   })
 
   const { data: horariosDisponibles, isLoading: loadingHorarios } = useQuery({
-    queryKey: ["disponibilidad", selectedPsicologo?.id_psicologo, selectedFecha],
+    queryKey: ["disponibilidad", selectedPsicologo?.id_empleado, selectedFecha],
     queryFn: () =>
       BookingService.getDisponibilidad(
-        selectedPsicologo!.id_psicologo,
+        selectedPsicologo!.id_empleado,
         selectedFecha,
       ),
     enabled: !!selectedPsicologo && !!selectedFecha,
@@ -156,7 +156,7 @@ function ReservarCitaPage() {
       email,
       fecha_nacimiento: fechaNacimiento,
       id_servicio: selectedServicio.id_servicio,
-      id_psicologo: selectedPsicologo.id_psicologo,
+      id_empleado: selectedPsicologo.id_empleado,
       fecha_cita: selectedFecha,
       hora_inicio: selectedHoraInicio,
       hora_fin: selectedHoraFin,
@@ -266,18 +266,18 @@ function ReservarCitaPage() {
                     <Grid templateColumns="repeat(auto-fit, minmax(280px, 1fr))" gap={4}>
                       {psicologos?.map((psicologo) => (
                         <Card.Root
-                          key={psicologo.id_psicologo}
+                          key={psicologo.id_empleado}
                           cursor="pointer"
                           onClick={() => handlePsicologoSelect(psicologo)}
                           borderWidth={
-                            selectedPsicologo?.id_psicologo ===
-                            psicologo.id_psicologo
+                            selectedPsicologo?.id_empleado ===
+                            psicologo.id_empleado
                               ? "2px"
                               : "1px"
                           }
                           borderColor={
-                            selectedPsicologo?.id_psicologo ===
-                            psicologo.id_psicologo
+                            selectedPsicologo?.id_empleado ===
+                            psicologo.id_empleado
                               ? "teal.500"
                               : "gray.200"
                           }
