@@ -548,13 +548,11 @@ def marcar_paciente_presente(session: SessionDep, id: int) -> Any:
         if paciente and psicologo:
             notificacion = Notificacion(
                 id_usuario=psicologo.id_usuario,
+                id_cita=cita.id_cita,
                 tipo_notificacion="cita_paciente_presente",
-                titulo="Paciente presente",
-                mensaje=f"El paciente {paciente.nombres} {paciente.apellido_paterno} ha llegado para su cita de las {cita.hora_inicio.strftime('%H:%M')}",
-                relacionado_tipo="cita",
-                relacionado_id=cita.id_cita,
-                prioridad="alta",
-                leida=False
+                asunto="Paciente presente en sala de espera",
+                contenido=f"El paciente {paciente.nombres} {paciente.apellido_paterno} ha llegado para su cita de las {cita.hora_inicio.strftime('%H:%M')}",
+                estado="pendiente"
             )
             session.add(notificacion)
             session.commit()
