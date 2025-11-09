@@ -75,6 +75,7 @@ class Rol(RolBase, table=True):
 
     # Relaciones
     usuarios: list["UsuarioRol"] = Relationship(back_populates="rol")
+    psicologos: list["Psicologo"] = Relationship(back_populates="rol")
 
 
 class RolPublic(RolBase):
@@ -219,7 +220,7 @@ class PsicologoBase(SQLModel):
     universidad: str | None = Field(default=None, max_length=150)
     anios_experiencia: int | None = None
     foto_perfil: str | None = Field(default=None, max_length=255)
-    rol_empleado: str | None = Field(default='psicologo', max_length=50)
+    id_rol: int = Field(foreign_key="roles.id_rol")
     estado: str = Field(default='activo', max_length=20)
 
 
@@ -236,6 +237,7 @@ class Psicologo(PsicologoBase, table=True):
 
     # Relaciones
     usuario: Usuario = Relationship(back_populates="psicologo")
+    rol: "Rol" = Relationship(back_populates="psicologos")
     especialidades: list["PsicologoEspecialidad"] = Relationship(back_populates="psicologo", cascade_delete=True)
     horarios: list["HorarioDisponible"] = Relationship(back_populates="psicologo", cascade_delete=True)
     citas: list["Cita"] = Relationship(back_populates="psicologo")
