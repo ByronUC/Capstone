@@ -288,14 +288,82 @@ def create_psicologo(
     return psicologo
 
 
+@router.put("/{empleado_id}", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
+def update_psicologo_complete(
+    session: SessionDep,
+    empleado_id: int,
+    psicologo_in: PsicologoCreate
+) -> Any:
+    """
+    Actualizar un empleado completamente (todos los campos requeridos) (solo admin).
+
+    Roles disponibles (id_rol):
+    - 1: administrador - Acceso completo al sistema
+    - 2: psicologo - Profesional de salud mental
+    - 3: recepcionista - Personal administrativo y atención al cliente
+    - 4: supervisor - Supervisor clínico con acceso a reportes
+    """
+    psicologo = session.get(Psicologo, empleado_id)
+    if not psicologo:
+        raise HTTPException(status_code=404, detail="Empleado no encontrado")
+
+    # Verificar RUT duplicado
+    if psicologo_in.rut != psicologo.rut:
+        existing_rut = session.exec(
+            select(Psicologo).where(
+                Psicologo.rut == psicologo_in.rut,
+                Psicologo.id_empleado != empleado_id
+            )
+        ).first()
+        if existing_rut:
+            raise HTTPException(status_code=400, detail="El RUT ya está registrado")
+
+    # Verificar registro profesional duplicado
+    if psicologo_in.registro_profesional != psicologo.registro_profesional:
+        existing_registro = session.exec(
+            select(Psicologo).where(
+                Psicologo.registro_profesional == psicologo_in.registro_profesional,
+                Psicologo.id_empleado != empleado_id
+            )
+        ).first()
+        if existing_registro:
+            raise HTTPException(
+                status_code=400,
+                detail="El registro profesional ya está registrado"
+            )
+
+    # Verificar que el id_usuario no esté asociado a otro empleado
+    if psicologo_in.id_usuario != psicologo.id_usuario:
+        existing_psicologo = session.exec(
+            select(Psicologo).where(
+                Psicologo.id_usuario == psicologo_in.id_usuario,
+                Psicologo.id_empleado != empleado_id
+            )
+        ).first()
+        if existing_psicologo:
+            raise HTTPException(
+                status_code=400,
+                detail="Este usuario ya está asociado a otro empleado"
+            )
+
+    # Actualizar completamente
+    psicologo_data = psicologo_in.model_dump()
+    psicologo.sqlmodel_update(psicologo_data)
+    session.add(psicologo)
+    session.commit()
+    session.refresh(psicologo)
+
+    return psicologo
+
+
 @router.patch("/{empleado_id}", dependencies=[Depends(get_current_active_superuser)], response_model=PsicologoPublic)
-def update_psicologo(
+def update_psicologo_partial(
     session: SessionDep,
     empleado_id: int,
     psicologo_in: PsicologoUpdate
 ) -> Any:
     """
-    Actualizar un empleado existente (solo admin).
+    Actualizar un empleado parcialmente (solo campos proporcionados) (solo admin).
 
     Roles disponibles (id_rol):
     - 1: administrador - Acceso completo al sistema
