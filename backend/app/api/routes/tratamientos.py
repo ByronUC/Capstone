@@ -157,7 +157,7 @@ def delete_tratamiento(session: SessionDep, id: int) -> Message:
     return Message(message="Tratamiento eliminado exitosamente")
 
 
-@router.patch("/{id}/observacion-inicial", response_model=TratamientoPublic)
+@router.post("/{id}/observacion-inicial", response_model=TratamientoPublic)
 def update_observacion_inicial(
     *,
     session: SessionDep,
@@ -165,9 +165,9 @@ def update_observacion_inicial(
     data: ObservacionInicial
 ) -> Any:
     """
-    Actualizar observación inicial del tratamiento.
+    Agregar observación inicial del tratamiento.
 
-    Permite al psicólogo agregar o modificar la observación/descripción inicial
+    Permite al psicólogo agregar la observación/descripción inicial
     del tratamiento después de la primera sesión con el paciente.
 
     Args:
