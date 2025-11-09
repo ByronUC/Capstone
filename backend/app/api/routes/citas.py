@@ -505,3 +505,65 @@ def get_citas_pendientes(session: SessionDep, skip: int = 0, limit: int = 100) -
     citas = session.exec(statement).all()
 
     return CitasPublic(data=citas, count=count)
+
+
+@router.put("/{id}/marcar-presente", response_model=dict)
+def marcar_paciente_presente(session: SessionDep, id: int) -> Any:
+    """
+    PUT /api/citas/{id}/marcar-presente
+
+    Endpoint para que recepcionista marque que el paciente llegó a la cita.
+
+    Lógica:
+    1. Actualizar estado de "confirmada" a "paciente_presente" (id_estado_cita = 9)
+    2. Crear notificación para el psicólogo avisando que el paciente llegó
+
+    Respuesta: confirmación con id_cita y nuevo estado
+    """
+    # 1. Buscar cita
+    cita = session.get(Cita, id)
+    if not cita:
+        raise HTTPException(status_code=404, detail="Cita no encontrada")
+
+    # Verificar que esté en estado "confirmada" (id = 2)
+    if cita.id_estado_cita != 2:
+        raise HTTPException(
+            status_code=400,
+            detail="Solo se puede marcar como presente una cita confirmada"
+        )
+
+    # 2. Actualizar estado a "paciente_presente" (id = 9)
+    cita.id_estado_cita = 9
+    session.add(cita)
+    session.commit()
+    session.refresh(cita)
+
+    # 3. Crear notificación para el psicólogo
+    try:
+        from app.models import Paciente, Psicologo
+
+        paciente = session.get(Paciente, cita.id_paciente)
+        psicologo = session.get(Psicologo, cita.id_empleado)
+
+        if paciente and psicologo:
+            notificacion = Notificacion(
+                id_usuario=psicologo.id_usuario,
+                tipo_notificacion="cita_paciente_presente",
+                titulo="Paciente presente",
+                mensaje=f"El paciente {paciente.nombres} {paciente.apellido_paterno} ha llegado para su cita de las {cita.hora_inicio.strftime('%H:%M')}",
+                relacionado_tipo="cita",
+                relacionado_id=cita.id_cita,
+                prioridad="alta",
+                leida=False
+            )
+            session.add(notificacion)
+            session.commit()
+    except Exception as e:
+        # Si falla la notificación, no afecta el cambio de estado
+        print(f"Error al crear notificación: {e}")
+
+    return {
+        "message": "Paciente marcado como presente exitosamente",
+        "id_cita": cita.id_cita,
+        "estado": "paciente_presente"
+    }
