@@ -267,7 +267,7 @@ class PsicologoUpdate(SQLModel):
     universidad: str | None = Field(default=None, max_length=150)
     anios_experiencia: int | None = None
     foto_perfil: str | None = Field(default=None, max_length=255)
-    rol_empleado: str | None = Field(default=None, max_length=50)
+    id_rol: int | None = None
     estado: str | None = Field(default=None, max_length=20)
 
 
