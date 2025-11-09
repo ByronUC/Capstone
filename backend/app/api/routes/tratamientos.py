@@ -1,7 +1,8 @@
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from sqlmodel import func, select
+from pydantic import BaseModel
 
 from app import crud
 from app.api.deps import SessionDep
@@ -13,6 +14,11 @@ from app.models import (
     TratamientosPublic,
     TratamientoUpdate,
 )
+
+
+class ObservacionInicial(BaseModel):
+    """Schema para actualizar observación inicial del tratamiento"""
+    observacion: str
 
 router = APIRouter(prefix="/tratamientos", tags=["tratamientos"])
 
@@ -149,3 +155,43 @@ def delete_tratamiento(session: SessionDep, id: int) -> Message:
     session.commit()
 
     return Message(message="Tratamiento eliminado exitosamente")
+
+
+@router.patch("/{id}/observacion-inicial", response_model=TratamientoPublic)
+def update_observacion_inicial(
+    *,
+    session: SessionDep,
+    id: int,
+    data: ObservacionInicial
+) -> Any:
+    """
+    Actualizar observación inicial del tratamiento.
+
+    Permite al psicólogo agregar o modificar la observación/descripción inicial
+    del tratamiento después de la primera sesión con el paciente.
+
+    Args:
+        id: ID del tratamiento
+        data: Objeto con la observación inicial del tratamiento
+
+    Request body example:
+    ```json
+    {
+      "observacion": "Paciente presenta síntomas de ansiedad leve..."
+    }
+    ```
+    """
+    db_tratamiento = session.get(Tratamiento, id)
+    if not db_tratamiento:
+        raise HTTPException(
+            status_code=404,
+            detail="El tratamiento no existe en el sistema",
+        )
+
+    # Actualizar solo la descripción (observación inicial)
+    db_tratamiento.descripcion = data.observacion
+    session.add(db_tratamiento)
+    session.commit()
+    session.refresh(db_tratamiento)
+
+    return db_tratamiento
