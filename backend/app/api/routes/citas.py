@@ -565,3 +565,81 @@ def marcar_paciente_presente(session: SessionDep, id: int) -> Any:
         "id_cita": cita.id_cita,
         "estado": "paciente_presente"
     }
+
+
+@router.put("/{id}/iniciar-sesion", response_model=dict)
+def iniciar_sesion_cita(session: SessionDep, id: int) -> Any:
+    """
+    PUT /api/citas/{id}/iniciar-sesion
+
+    Endpoint para que el psicólogo marque que la sesión ha comenzado.
+
+    Lógica:
+    1. Actualizar estado de "paciente_presente" a "en_curso" (id_estado_cita = 3)
+    2. Registrar el momento en que comenzó la sesión
+
+    Respuesta: confirmación con id_cita y nuevo estado
+    """
+    # 1. Buscar cita
+    cita = session.get(Cita, id)
+    if not cita:
+        raise HTTPException(status_code=404, detail="Cita no encontrada")
+
+    # Verificar que esté en estado "paciente_presente" (id = 9)
+    if cita.id_estado_cita != 9:
+        raise HTTPException(
+            status_code=400,
+            detail="Solo se puede iniciar sesión cuando el paciente está presente"
+        )
+
+    # 2. Actualizar estado a "en_curso" (id = 3)
+    cita.id_estado_cita = 3
+    cita.fecha_modificacion = datetime.utcnow()
+    session.add(cita)
+    session.commit()
+    session.refresh(cita)
+
+    return {
+        "message": "Sesión iniciada exitosamente",
+        "id_cita": cita.id_cita,
+        "estado": "en_curso"
+    }
+
+
+@router.put("/{id}/completar", response_model=dict)
+def completar_cita(session: SessionDep, id: int) -> Any:
+    """
+    PUT /api/citas/{id}/completar
+
+    Endpoint para que el psicólogo marque la cita como completada.
+
+    Lógica:
+    1. Actualizar estado de "en_curso" a "completada" (id_estado_cita = 4)
+    2. Registrar el momento en que finalizó la sesión
+
+    Respuesta: confirmación con id_cita y nuevo estado
+    """
+    # 1. Buscar cita
+    cita = session.get(Cita, id)
+    if not cita:
+        raise HTTPException(status_code=404, detail="Cita no encontrada")
+
+    # Verificar que esté en estado "en_curso" (id = 3)
+    if cita.id_estado_cita != 3:
+        raise HTTPException(
+            status_code=400,
+            detail="Solo se puede completar una cita que está en curso"
+        )
+
+    # 2. Actualizar estado a "completada" (id = 4)
+    cita.id_estado_cita = 4
+    cita.fecha_modificacion = datetime.utcnow()
+    session.add(cita)
+    session.commit()
+    session.refresh(cita)
+
+    return {
+        "message": "Cita completada exitosamente",
+        "id_cita": cita.id_cita,
+        "estado": "completada"
+    }
