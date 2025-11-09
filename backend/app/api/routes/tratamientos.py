@@ -151,6 +151,66 @@ def delete_tratamiento(session: SessionDep, id: int) -> Message:
     return Message(message="Tratamiento eliminado exitosamente")
 
 
+@router.post("/crear-con-observacion", response_model=TratamientoPublic)
+def crear_tratamiento_con_observacion(
+    *,
+    session: SessionDep,
+    tratamiento_in: TratamientoCreate
+) -> Any:
+    """
+    Crear tratamiento con observación inicial.
+
+    Crea un nuevo tratamiento después de la primera cita con el paciente.
+    La observación inicial se guarda en el campo 'descripcion'.
+
+    Este endpoint se usa cuando el psicólogo completa la primera sesión
+    y quiere registrar sus observaciones iniciales.
+
+    Request body example:
+    ```json
+    {
+      "tipo_tratamiento": "Terapia Cognitivo Conductual",
+      "descripcion": "Paciente presenta síntomas de ansiedad...",
+      "objetivos": "Reducir niveles de ansiedad",
+      "fecha_inicio": "2025-11-09",
+      "fecha_fin_estimada": "2025-12-09",
+      "estado": "activo",
+      "id_paciente": 7,
+      "id_empleado": 1,
+      "id_cita": 11
+    }
+    ```
+    """
+    # Verificar que la cita existe y pertenece al paciente
+    if tratamiento_in.id_cita:
+        from app.models import Cita
+        cita = session.get(Cita, tratamiento_in.id_cita)
+        if not cita:
+            raise HTTPException(
+                status_code=404,
+                detail="La cita especificada no existe"
+            )
+        if cita.id_paciente != tratamiento_in.id_paciente:
+            raise HTTPException(
+                status_code=400,
+                detail="La cita no pertenece al paciente especificado"
+            )
+
+        # Verificar que no exista ya un tratamiento para esta cita
+        existing = session.exec(
+            select(Tratamiento).where(Tratamiento.id_cita == tratamiento_in.id_cita)
+        ).first()
+        if existing:
+            raise HTTPException(
+                status_code=400,
+                detail="Ya existe un tratamiento para esta cita"
+            )
+
+    # Crear el tratamiento
+    tratamiento = crud.create_tratamiento(session=session, tratamiento_create=tratamiento_in)
+    return tratamiento
+
+
 @router.post("/{id}/observacion-inicial", response_model=TratamientoPublic)
 def update_observacion_inicial(
     *,
@@ -159,10 +219,10 @@ def update_observacion_inicial(
     observacion: str = Body(..., embed=True)
 ) -> Any:
     """
-    Agregar observación inicial del tratamiento.
+    Actualizar observación inicial del tratamiento existente.
 
-    Permite al psicólogo agregar la observación/descripción inicial
-    del tratamiento después de la primera sesión con el paciente.
+    Permite al psicólogo modificar la observación/descripción inicial
+    de un tratamiento que ya fue creado.
 
     Args:
         id: ID del tratamiento
