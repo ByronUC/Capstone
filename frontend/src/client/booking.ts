@@ -115,9 +115,9 @@ export const BookingService = {
     return response.json()
   },
 
-  // GET /psicologos/disponibles
+  // GET /empleados/disponibles
   async getPsicologosDisponibles(especialidadId?: number): Promise<Psicologo[]> {
-    const url = new URL(`${OpenAPI.BASE}/api/v1/psicologos/disponibles`)
+    const url = new URL(`${OpenAPI.BASE}/api/v1/empleados/disponibles`)
     if (especialidadId) {
       url.searchParams.append("especialidad_id", especialidadId.toString())
     }
@@ -136,12 +136,12 @@ export const BookingService = {
     return response.json()
   },
 
-  // GET /psicologos/disponibilidad
+  // GET /empleados/disponibilidad
   async getDisponibilidad(
     psicologoId: number,
     fecha: string,
   ): Promise<HorarioDisponibilidadInfo[]> {
-    const url = new URL(`${OpenAPI.BASE}/api/v1/psicologos/disponibilidad`)
+    const url = new URL(`${OpenAPI.BASE}/api/v1/empleados/disponibilidad`)
     url.searchParams.append("psicologo_id", psicologoId.toString())
     url.searchParams.append("fecha", fecha)
 
