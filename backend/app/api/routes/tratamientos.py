@@ -2,7 +2,6 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Body
 from sqlmodel import func, select
-from pydantic import BaseModel
 
 from app import crud
 from app.api.deps import SessionDep
@@ -14,11 +13,6 @@ from app.models import (
     TratamientosPublic,
     TratamientoUpdate,
 )
-
-
-class ObservacionInicial(BaseModel):
-    """Schema para actualizar observación inicial del tratamiento"""
-    observacion: str
 
 router = APIRouter(prefix="/tratamientos", tags=["tratamientos"])
 
@@ -162,7 +156,7 @@ def update_observacion_inicial(
     *,
     session: SessionDep,
     id: int,
-    data: ObservacionInicial
+    observacion: str = Body(..., embed=True)
 ) -> Any:
     """
     Agregar observación inicial del tratamiento.
@@ -172,7 +166,7 @@ def update_observacion_inicial(
 
     Args:
         id: ID del tratamiento
-        data: Objeto con la observación inicial del tratamiento
+        observacion: Texto de la observación inicial del tratamiento
 
     Request body example:
     ```json
@@ -189,7 +183,7 @@ def update_observacion_inicial(
         )
 
     # Actualizar solo la descripción (observación inicial)
-    db_tratamiento.descripcion = data.observacion
+    db_tratamiento.descripcion = observacion
     session.add(db_tratamiento)
     session.commit()
     session.refresh(db_tratamiento)
