@@ -641,7 +641,7 @@ class Tratamiento(TratamientoBase, table=True):
 class TratamientoPublic(TratamientoBase):
     id_tratamiento: int
     id_paciente: int
-    id_psicologo: int
+    id_empleado: int
     id_cita: int | None
     fecha_registro: datetime
 
@@ -653,7 +653,7 @@ class TratamientosPublic(SQLModel):
 
 class TratamientoCreate(TratamientoBase):
     id_paciente: int
-    id_psicologo: int
+    id_empleado: int
     id_cita: int | None = None
 
 
