@@ -181,6 +181,22 @@ def crear_tratamiento_con_observacion(
     }
     ```
     """
+    # Validar que id_empleado sea válido
+    if tratamiento_in.id_empleado <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Debe especificar un psicólogo válido (id_empleado)"
+        )
+
+    # Verificar que el psicólogo existe
+    from app.models import Psicologo
+    psicologo = session.get(Psicologo, tratamiento_in.id_empleado)
+    if not psicologo:
+        raise HTTPException(
+            status_code=404,
+            detail=f"El psicólogo con id {tratamiento_in.id_empleado} no existe"
+        )
+
     # Verificar que la cita existe y pertenece al paciente
     if tratamiento_in.id_cita:
         from app.models import Cita
