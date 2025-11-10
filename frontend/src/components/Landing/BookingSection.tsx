@@ -131,10 +131,10 @@ export default function BookingSection() {
 
   // Cargar horarios disponibles
   const { data: horariosDisponibles, isLoading: loadingHorarios } = useQuery({
-    queryKey: ["disponibilidad-landing", selectedPsicologo?.id_psicologo, selectedFecha],
+    queryKey: ["disponibilidad-landing", selectedPsicologo?.id_empleado, selectedFecha],
     queryFn: () =>
       BookingService.getDisponibilidad(
-        selectedPsicologo!.id_psicologo,
+        selectedPsicologo!.id_empleado,
         selectedFecha,
       ),
     enabled: !!selectedPsicologo && !!selectedFecha,
@@ -244,7 +244,7 @@ export default function BookingSection() {
       email,
       fecha_nacimiento: fechaNacimiento,
       id_servicio: selectedServicio.id_servicio,
-      id_psicologo: selectedPsicologo.id_psicologo,
+      id_empleado: selectedPsicologo.id_empleado,
       fecha_cita: selectedFecha,
       hora_inicio: selectedHoraInicio,
       hora_fin: selectedHoraFin,
@@ -436,12 +436,12 @@ export default function BookingSection() {
                       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
                         {psicologos?.map((psicologo: Psicologo) => (
                           <Card.Root
-                            key={psicologo.id_psicologo}
+                            key={psicologo.id_empleado}
                             cursor="pointer"
                             onClick={() => handlePsicologoSelect(psicologo)}
                             bg="white"
-                            borderWidth={selectedPsicologo?.id_psicologo === psicologo.id_psicologo ? "3px" : "1px"}
-                            borderColor={selectedPsicologo?.id_psicologo === psicologo.id_psicologo ? "blue.500" : "gray.300"}
+                            borderWidth={selectedPsicologo?.id_empleado === psicologo.id_empleado ? "3px" : "1px"}
+                            borderColor={selectedPsicologo?.id_empleado === psicologo.id_empleado ? "blue.500" : "gray.300"}
                             _hover={{ borderColor: "blue.400", transform: "scale(1.02)", shadow: "md" }}
                             transition="all 0.2s"
                           >
