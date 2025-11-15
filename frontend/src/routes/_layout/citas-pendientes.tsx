@@ -137,7 +137,7 @@ function CitasPendientesPage() {
                       {formatHora(cita.hora_inicio)} - {formatHora(cita.hora_fin)}
                     </Table.Cell>
                     <Table.Cell>#{cita.id_paciente}</Table.Cell>
-                    <Table.Cell>#{cita.id_psicologo}</Table.Cell>
+                    <Table.Cell>#{cita.id_empleado}</Table.Cell>
                     <Table.Cell>#{cita.id_servicio}</Table.Cell>
                     <Table.Cell>
                       <Badge colorScheme="purple" fontFamily="mono">
@@ -175,7 +175,7 @@ function CitasPendientesPage() {
                                   <strong>Paciente:</strong> #{cita.id_paciente}
                                 </Text>
                                 <Text fontSize="sm">
-                                  <strong>Psicólogo:</strong> #{cita.id_psicologo}
+                                  <strong>Psicólogo:</strong> #{cita.id_empleado}
                                 </Text>
                               </Box>
                             </DialogBody>
