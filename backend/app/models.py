@@ -751,7 +751,7 @@ class Seguimiento(SeguimientoBase, table=True):
 class SeguimientoPublic(SeguimientoBase):
     id_seguimiento: int
     id_paciente: int
-    id_psicologo: int
+    id_empleado: int
     id_tratamiento: int | None
     fecha_registro: datetime
 
@@ -763,7 +763,7 @@ class SeguimientosPublic(SQLModel):
 
 class SeguimientoCreate(SeguimientoBase):
     id_paciente: int
-    id_psicologo: int
+    id_empleado: int
     id_tratamiento: int | None = None
 
 
