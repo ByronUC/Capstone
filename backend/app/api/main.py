@@ -15,6 +15,7 @@ from app.api.routes import (
     psicologos,
     previsiones,
     ciudades,
+    salas,
 )
 from app.core.config import settings
 
@@ -38,6 +39,7 @@ api_router.include_router(seguimiento.router)
 # Módulos de datos maestros
 api_router.include_router(previsiones.router)
 api_router.include_router(ciudades.router)
+api_router.include_router(salas.router)
 
 
 if settings.ENVIRONMENT == "local":

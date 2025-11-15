@@ -444,6 +444,28 @@ class SalaAtencion(SalaAtencionBase, table=True):
     citas: list["Cita"] = Relationship(back_populates="sala")
 
 
+class SalaAtencionPublic(SalaAtencionBase):
+    id_sala: int
+    fecha_creacion: datetime
+
+
+class SalasAtencionPublic(SQLModel):
+    data: list[SalaAtencionPublic]
+    count: int
+
+
+class SalaAtencionCreate(SalaAtencionBase):
+    pass
+
+
+class SalaAtencionUpdate(SQLModel):
+    nombre_sala: str | None = Field(default=None, max_length=50)
+    ubicacion: str | None = Field(default=None, max_length=100)
+    capacidad: int | None = None
+    equipamiento: str | None = None
+    estado: str | None = Field(default=None, max_length=20)
+
+
 # Tabla: horarios_disponibles
 class HorarioDisponibleBase(SQLModel):
     dia_semana: str = Field(max_length=20)

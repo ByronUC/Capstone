@@ -10,6 +10,7 @@ from app.models import (
     Tratamiento, TratamientoCreate, TratamientoUpdate,
     Medicamento, MedicamentoCreate, MedicamentoUpdate,
     Seguimiento, SeguimientoCreate, SeguimientoUpdate,
+    SalaAtencion, SalaAtencionCreate, SalaAtencionUpdate,
 )
 
 
@@ -183,3 +184,26 @@ def update_seguimiento(*, session: Session, db_seguimiento: Seguimiento, seguimi
     session.commit()
     session.refresh(db_seguimiento)
     return db_seguimiento
+
+
+# ============================================
+# CRUD SALAS DE ATENCION
+# ============================================
+
+def create_sala_atencion(*, session: Session, sala_create: SalaAtencionCreate) -> SalaAtencion:
+    """Crear una nueva sala de atención en el sistema"""
+    db_obj = SalaAtencion.model_validate(sala_create)
+    session.add(db_obj)
+    session.commit()
+    session.refresh(db_obj)
+    return db_obj
+
+
+def update_sala_atencion(*, session: Session, db_sala: SalaAtencion, sala_in: SalaAtencionUpdate) -> Any:
+    """Actualizar información de una sala de atención existente"""
+    sala_data = sala_in.model_dump(exclude_unset=True)
+    db_sala.sqlmodel_update(sala_data)
+    session.add(db_sala)
+    session.commit()
+    session.refresh(db_sala)
+    return db_sala
