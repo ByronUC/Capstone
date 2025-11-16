@@ -117,7 +117,47 @@ def create_reserva(*, session: SessionDep, reserva: ReservaCreate) -> Any:
     hora_inicio = time.fromisoformat(reserva.hora_inicio)
     hora_fin = time.fromisoformat(reserva.hora_fin)
 
-    # Verificar si ya existe una cita en ese horario
+    # 1.1 Validar que la hora esté dentro de los horarios disponibles del psicólogo
+    dias_semana = {
+        0: "lunes",
+        1: "martes",
+        2: "miercoles",
+        3: "jueves",
+        4: "viernes",
+        5: "sabado",
+        6: "domingo"
+    }
+    dia_semana = dias_semana[fecha_cita.weekday()]
+
+    from app.models import HorarioDisponible
+    statement_horario = select(HorarioDisponible).where(
+        HorarioDisponible.id_empleado == reserva.id_empleado,
+        HorarioDisponible.dia_semana == dia_semana,
+        HorarioDisponible.disponible == True
+    )
+    horarios_disponibles = session.exec(statement_horario).all()
+
+    # Verificar si la hora solicitada está dentro de algún horario disponible
+    hora_valida = False
+    for horario in horarios_disponibles:
+        # Validar rango de fechas si está configurado
+        if horario.fecha_desde and fecha_cita < horario.fecha_desde:
+            continue
+        if horario.fecha_hasta and fecha_cita > horario.fecha_hasta:
+            continue
+
+        # Verificar si la hora está dentro del rango
+        if horario.hora_inicio <= hora_inicio < horario.hora_fin:
+            hora_valida = True
+            break
+
+    if not hora_valida:
+        raise HTTPException(
+            status_code=400,
+            detail=f"La hora seleccionada no está dentro de los horarios disponibles del profesional para el día {dia_semana}."
+        )
+
+    # 1.2 Verificar si ya existe una cita en ese horario
     statement = select(Cita).where(
         Cita.id_empleado == reserva.id_empleado,
         Cita.fecha_cita == fecha_cita,
