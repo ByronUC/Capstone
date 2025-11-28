@@ -60,6 +60,7 @@ class ReagendarResponse(BaseModel):
     codigo_confirmacion: str
     nueva_fecha: str
     nueva_hora_inicio: str
+    nueva_hora_fin: str
     id_estado_cita: int
 
 
@@ -347,6 +348,7 @@ def reagendar_cita(
         "codigo_confirmacion": codigo_confirmacion,
         "nueva_fecha": str(nueva_fecha),
         "nueva_hora_inicio": str(nueva_hora_inicio),
+        "nueva_hora_fin": str(nueva_hora_fin),
         "id_estado_cita": cita.id_estado_cita
     }
 
