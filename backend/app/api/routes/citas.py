@@ -52,6 +52,7 @@ class ReagendarRequest(BaseModel):
     nueva_fecha: str  # YYYY-MM-DD
     nueva_hora_inicio: str  # HH:MM
     nueva_hora_fin: str  # HH:MM
+    id_estado_cita: int
 
 
 class ReagendarResponse(BaseModel):
@@ -301,8 +302,8 @@ def reagendar_cita(
     cita.hora_fin = nueva_hora_fin
     cita.fecha_modificacion = datetime.utcnow()
 
-    # 4. Cambiar estado a "Reprogramada" (asumimos id = 4)
-    cita.id_estado_cita = 4
+    # 4. Actualizar estado de la cita con el valor recibido
+    cita.id_estado_cita = reagendar.id_estado_cita
 
     session.add(cita)
     session.commit()
