@@ -54,6 +54,15 @@ class ReagendarRequest(BaseModel):
     nueva_hora_fin: str  # HH:MM
 
 
+class ReagendarResponse(BaseModel):
+    """Schema de respuesta para reagendar una cita"""
+    message: str
+    codigo_confirmacion: str
+    nueva_fecha: str
+    nueva_hora_inicio: str
+    id_estado_cita: int
+
+
 @router.get("/", response_model=CitasPublic)
 def read_citas(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     """
@@ -218,7 +227,7 @@ def create_reserva(*, session: SessionDep, reserva: ReservaCreate) -> Any:
     }
 
 
-@router.put("/{codigo_confirmacion}/reagendar", response_model=dict)
+@router.put("/{codigo_confirmacion}/reagendar", response_model=ReagendarResponse)
 def reagendar_cita(
     *,
     session: SessionDep,
